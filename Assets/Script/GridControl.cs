@@ -29,15 +29,6 @@ public class GridControl : MonoBehaviour
                 path = pathfinding.FindPath(currentPosition.x, currentPosition.y, gridPosition.x, gridPosition.y);
 
                 currentPosition = gridPosition;
-                //GridObject gridObject = grid.GetPlacedObject(gridPosition);
-                //if (gridObject == null)
-                //{
-                //    Debug.Log("x=" + gridPosition.x + "y=" + gridPosition.y + " is empty");
-                //}
-                //else
-                //{
-                //    Debug.Log("x=" + gridPosition.x + "y=" + gridObject.GetComponent<Character>().Name);
-                //}
             }
         }
     }
