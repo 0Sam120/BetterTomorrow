@@ -5,26 +5,34 @@ using UnityEngine.InputSystem.LowLevel;
 
 public class CameraControl : MonoBehaviour
 {
-    [SerializeField] private float inputSensitivity = 1f;
-    [SerializeField] private InputAction cameraControl;
-    private Vector3 input;
+    private CameraMovement cameraActions;
+    private InputAction movement;
+    private Transform cameraTransform;
 
-    private void OnEnable() => cameraControl.Enable();
-    private void OnDisable() => cameraControl.Disable();
+    // horizontoal motion
+    [SerializeField] private float maxSpeed = 5f;
+    [SerializeField] private float acceleration = 10f;
+    [SerializeField] private float damping = 15f;
+    private float speed;
 
-    private void Update()
-    {
-        ReadInput();
-        MoveCamera();
-    }
+    // zooming
+    [SerializeField] private float stepSize = 2f;
+    [SerializeField] private float zoomDampening = 7.5f;
+    [SerializeField] private float minHeight = 5f;
+    [SerializeField] private float maxHeight = 50f;
+    [SerializeField] private float zoomSpeed = 2f;
 
-    private void ReadInput()
-    {
-        input = cameraControl.ReadValue<Vector3>() * inputSensitivity;
-    }
+    // rotation
+    [SerializeField] private float maxRotationSpeed = 1f;
 
-    private void MoveCamera()
-    {
-        transform.position += input * Time.deltaTime;
-    }
+    // values set in various functions
+    private Vector3 targetPosition;
+
+    private float zoomHeight;
+    private float rotationInput;
+
+    private Vector3 horizontalVelocity;
+    private Vector3 lastPosition;
+
+    
 }
