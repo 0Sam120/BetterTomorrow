@@ -10,6 +10,12 @@ public class GridControl : MonoBehaviour
     Pathfinding pathfinding;
     Vector2Int currentPosition = new Vector2Int();
     List<PathNode> path;
+    Camera cam;
+
+    private void Awake()
+    {
+        cam = GetComponent<Camera>();
+    }
 
     private void Start()
     {
@@ -20,7 +26,7 @@ public class GridControl : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             if(Physics.Raycast(ray, out hit, float.MaxValue, terrain))
             {
