@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GridMap : MonoBehaviour
@@ -76,6 +77,8 @@ public class GridMap : MonoBehaviour
 
     public Vector2Int GetGridPosition(Vector3 worldPosition)
     {
+        worldPosition.x += cellSize / 2;
+        worldPosition.y += cellSize / 2;
         Vector2Int positionOfGrid = new Vector2Int((int)(worldPosition.x / cellSize), (int)(worldPosition.z / cellSize));
         return positionOfGrid;
     }
@@ -153,5 +156,17 @@ public class GridMap : MonoBehaviour
     public bool CheckWalkable(int pos_x, int pos_y)
     {
         return grid[pos_x, pos_y].passable;
+    }
+
+    public List<Vector3> ConvertPathNodesToWorldPosition(List<PathNode> path)
+    {
+        List<Vector3> worldPositions = new List<Vector3>();
+
+        for(int i = 0; i < path.Count; i++)
+        {
+            worldPositions.Add(GetWorldPosition(path[i].pos_x, path[i].pos_y, true));
+        }
+
+        return worldPositions;
     }
 }

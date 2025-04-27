@@ -16,9 +16,9 @@
                 },
                 {
                     "name": "RotateCamera",
-                    "type": "Value",
+                    "type": "Button",
                     "id": "6de45a95-11ad-4408-a61c-dfc3a27e56cb",
-                    "expectedControlType": "Vector2",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -101,15 +101,37 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "",
-                    "id": "ae2ff8a4-7413-4b4d-bc39-14e95d7918d0",
-                    "path": "<Mouse>/delta",
+                    "name": "1D Axis",
+                    "id": "7a682cc5-ebd7-48f8-9035-64428d1605c9",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RotateCamera",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "Negative",
+                    "id": "0b76218c-0e7c-403b-a834-a1491fc4de66",
+                    "path": "<Keyboard>/q",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "RotateCamera",
                     "isComposite": false,
-                    "isPartOfComposite": false
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Positive",
+                    "id": "eec4e49f-37eb-46ce-93ce-ebca05f1ab25",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RotateCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         }

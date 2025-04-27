@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
+using static UnityEngine.Rendering.DebugUI;
 
 public class CameraControl : MonoBehaviour
 {
@@ -29,7 +30,7 @@ public class CameraControl : MonoBehaviour
     private Vector3 targetPosition;
 
     private float zoomHeight;
-    private float rotationInput;
+    private float currentRotationInput = 0f;
 
     private Vector3 horizontalVelocity;
     private Vector3 lastPosition;
@@ -56,14 +57,16 @@ public class CameraControl : MonoBehaviour
         
         lastPosition = this.transform.position;
         movement = cameraActions.Camera.Movement;
-        cameraActions.Camera.RotateCamera.performed += RotateCamera;
+        cameraActions.Camera.RotateCamera.started += RotateCamera;
+        cameraActions.Camera.RotateCamera.canceled += RotateCamera;
         cameraActions.Camera.ZoomCamera.performed += ZoomCamera;
         cameraActions.Camera.Enable();
     }
 
     private void OnDisable()
     {
-        cameraActions.Camera.RotateCamera.performed -= RotateCamera;
+        cameraActions.Camera.RotateCamera.started -= RotateCamera;
+        cameraActions.Camera.RotateCamera.canceled -= RotateCamera;
         cameraActions.Camera.ZoomCamera.performed -= ZoomCamera;
         cameraActions.Disable();
     }
@@ -118,11 +121,8 @@ public class CameraControl : MonoBehaviour
 
     private void RotateCamera(InputAction.CallbackContext inputValue)
     {
-        if (!Mouse.current.middleButton.isPressed)
-            return;
-
-        float value = inputValue.ReadValue<Vector2>().x;
-        transform.rotation = Quaternion.Euler(0f, value * maxRotationSpeed + transform.rotation.eulerAngles.y, 0f);
+        currentRotationInput = inputValue.ReadValue<float>();
+        Debug.Log($"Rotation input value: {currentRotationInput}");
     }
 
     private void ZoomCamera(InputAction.CallbackContext inputValue)
@@ -143,6 +143,12 @@ public class CameraControl : MonoBehaviour
     {
         Vector3 zoomTarget = new Vector3(cameraTransform.localPosition.x, zoomHeight, cameraTransform.localPosition.z);
         zoomTarget -= zoomSpeed * (zoomHeight - cameraTransform.localPosition.y) * Vector3.forward;
+
+        if (Mathf.Abs(currentRotationInput) != 0f)
+        {
+            float rotationAmount = currentRotationInput * maxRotationSpeed * Time.deltaTime;
+            transform.Rotate(Vector3.up, rotationAmount);
+        }
 
         cameraTransform.localPosition = Vector3.Lerp(cameraTransform.localPosition, zoomTarget, Time.deltaTime * zoomDampening);
         cameraTransform.LookAt(this.transform);
