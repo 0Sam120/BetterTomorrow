@@ -2,11 +2,10 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
+
 /// Handles player interaction with the grid-based map.
 /// Calculates pathfinding when clicking on the terrain.
 /// Draws the current path using Gizmos.
-/// </summary>
 public class GridControl : MonoBehaviour
 {
     [SerializeField] GridMap grid;         // Reference to the grid map
