@@ -119,6 +119,33 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &1610802659 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1016442027478969946, guid: 679662b7b919a3e44a4e11860d27f93c, type: 3}
+  m_PrefabInstance: {fileID: 9115605520731598043}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1610802661
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1610802659}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: b8fcbe10503c044458c1b097144c50ac, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1905906938
 GameObject:
   m_ObjectHideFlags: 0
@@ -377,7 +404,34 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
---- !u!1001 &5228035402675418152
+--- !u!1 &1951877670 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1013266288777281589, guid: 679662b7b919a3e44a4e11860d27f93c, type: 3}
+  m_PrefabInstance: {fileID: 9115605520731598043}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1951877673
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1951877670}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 346af3b70acc4504fab810546b32e689, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!1001 &9115605520731598043
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -385,59 +439,80 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3597047116629398439, guid: 152c3a1261694c54bbc446f42ab21d5a, type: 3}
-      propertyPath: m_Name
-      value: CowboyRio_Unity
-      objectReference: {fileID: 0}
-    - target: {fileID: 4224543472922233117, guid: 152c3a1261694c54bbc446f42ab21d5a, type: 3}
+    - target: {fileID: 379438158569446031, guid: 679662b7b919a3e44a4e11860d27f93c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4224543472922233117, guid: 152c3a1261694c54bbc446f42ab21d5a, type: 3}
+    - target: {fileID: 379438158569446031, guid: 679662b7b919a3e44a4e11860d27f93c, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4224543472922233117, guid: 152c3a1261694c54bbc446f42ab21d5a, type: 3}
+    - target: {fileID: 379438158569446031, guid: 679662b7b919a3e44a4e11860d27f93c, type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4224543472922233117, guid: 152c3a1261694c54bbc446f42ab21d5a, type: 3}
+    - target: {fileID: 379438158569446031, guid: 679662b7b919a3e44a4e11860d27f93c, type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 4224543472922233117, guid: 152c3a1261694c54bbc446f42ab21d5a, type: 3}
+    - target: {fileID: 379438158569446031, guid: 679662b7b919a3e44a4e11860d27f93c, type: 3}
       propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4224543472922233117, guid: 152c3a1261694c54bbc446f42ab21d5a, type: 3}
+    - target: {fileID: 379438158569446031, guid: 679662b7b919a3e44a4e11860d27f93c, type: 3}
       propertyPath: m_LocalRotation.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4224543472922233117, guid: 152c3a1261694c54bbc446f42ab21d5a, type: 3}
+    - target: {fileID: 379438158569446031, guid: 679662b7b919a3e44a4e11860d27f93c, type: 3}
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4224543472922233117, guid: 152c3a1261694c54bbc446f42ab21d5a, type: 3}
+    - target: {fileID: 379438158569446031, guid: 679662b7b919a3e44a4e11860d27f93c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4224543472922233117, guid: 152c3a1261694c54bbc446f42ab21d5a, type: 3}
+    - target: {fileID: 379438158569446031, guid: 679662b7b919a3e44a4e11860d27f93c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4224543472922233117, guid: 152c3a1261694c54bbc446f42ab21d5a, type: 3}
+    - target: {fileID: 379438158569446031, guid: 679662b7b919a3e44a4e11860d27f93c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 1013266288777281589, guid: 679662b7b919a3e44a4e11860d27f93c, type: 3}
+      propertyPath: m_Name
+      value: Magician_RIO_Unity
+      objectReference: {fileID: 0}
+    - target: {fileID: 6026981964852969717, guid: 679662b7b919a3e44a4e11860d27f93c, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 39170899bb4469b4595c1b3642a649c6, type: 2}
+    - target: {fileID: 6026981964852969717, guid: 679662b7b919a3e44a4e11860d27f93c, type: 3}
+      propertyPath: m_WarningMessage
+      value: "\nBinding warning: Some generic clip(s) animate transforms that are
+        already bound by a Humanoid avatar. These transforms can only be changed
+        by Humanoid clips.\n\tTransform 'root'\n\tTransform 'root'\n\tTransform 'spine_02.x'\n\tTransform
+        'spine_01.x'\n\tTransform 'thigh_stretch.r'\n\tTransform 'foot.l'\n\tTransform
+        'foot.r'\n\tTransform 'leg_stretch.r'\n\tTransform 'thigh_stretch.l'\n\tTransform
+        'leg_stretch.l'\n\tand more ...\n\tFrom animation clip 'Human_Idle'\n\tFrom
+        animation clip 'Shoot'\n\tFrom animation clip 'Pistol_walk'"
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 6026981964852969717, guid: 679662b7b919a3e44a4e11860d27f93c, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 152c3a1261694c54bbc446f42ab21d5a, type: 3}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1013266288777281589, guid: 679662b7b919a3e44a4e11860d27f93c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1951877673}
+    - targetCorrespondingSourceObject: {fileID: 1016442027478969946, guid: 679662b7b919a3e44a4e11860d27f93c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1610802661}
+  m_SourcePrefab: {fileID: 100100000, guid: 679662b7b919a3e44a4e11860d27f93c, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1905906941}
   - {fileID: 1948270623}
-  - {fileID: 5228035402675418152}
+  - {fileID: 9115605520731598043}
