@@ -49,6 +49,61 @@ public class Pathfinding : MonoBehaviour
         }
     }
 
+    public void CalculateWalkableNodes(int startX, int startY, float range, ref List<PathNode> toHighlight)
+    {
+        PathNode startNode = pathNodes[startX, startY];
+
+        List<PathNode> openList = new List<PathNode>(); // Nodes to be evaluated
+        List<PathNode> closedList = new List<PathNode>(); // Nodes already evaluated
+
+        openList.Add(startNode);
+
+        while (openList.Count > 0)
+        {
+            PathNode currentList = openList[0];
+
+            openList.Remove(currentList);
+            closedList.Add(currentList);
+
+            List<PathNode> neighbourNodes = new List<PathNode>();
+            for (int x = -1; x < 2; x++)
+            {
+                for (int y = -1; y < 2; y++)
+                {
+                    if (x == 0 && y == 0) { continue; } // Skip self
+                    if (gridMap.CheckBoundry(currentList.pos_x + x, currentList.pos_y + y) == false) { continue; }
+
+                    neighbourNodes.Add(pathNodes[currentList.pos_x + x, currentList.pos_y + y]);
+                }
+            }
+
+            for (int i = 0; i < neighbourNodes.Count; i++)
+            {
+                if (closedList.Contains(neighbourNodes[i])) { continue; }
+                if (gridMap.CheckWalkable(neighbourNodes[i].pos_x, neighbourNodes[i].pos_y) == false) { continue; }
+
+                float movmentCost = currentList.gValue + CalculateDistance(currentList, neighbourNodes[i]);
+
+                if (movmentCost > range) { continue; }
+
+                if (!openList.Contains(neighbourNodes[i]) || movmentCost < neighbourNodes[i].gValue)
+                {
+                    neighbourNodes[i].gValue = movmentCost;
+                    neighbourNodes[i].parentNode = currentList;
+
+                    if (!openList.Contains(neighbourNodes[i]))
+                    {
+                        openList.Add(neighbourNodes[i]);
+                    }
+                }
+            }
+        }
+        if(toHighlight != null)
+        {
+            toHighlight.AddRange(closedList);
+        }
+    }
+
     // Finds a path from start position to end position
     public List<PathNode> FindPath(int startX, int startY, int endX, int endY)
     {
@@ -146,6 +201,21 @@ public class Pathfinding : MonoBehaviour
             currentNode = currentNode.parentNode;
         }
         path.Reverse(); // So that it starts at startNode and ends at endNode
+
+        return path;
+    }
+
+    public List<PathNode> TraceBackPatch(int x, int y)
+    {
+        if (!gridMap.CheckBoundry(x, y)) { return null; }
+        List<PathNode> path = new List<PathNode>();
+
+        PathNode currentNode = pathNodes[x, y];
+        while (currentNode.parentNode != null)
+        {
+            path.Add(currentNode);
+            currentNode = currentNode.parentNode;
+        }
 
         return path;
     }

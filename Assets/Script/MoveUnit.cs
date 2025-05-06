@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,26 +7,41 @@ public class MoveUnit : MonoBehaviour
     [SerializeField] GridMap grid; // Reference to the GridMap for position calculations
     [SerializeField] LayerMask terrain; // LayerMask to detect valid terrain clicks
     [SerializeField] GridObject targetCharacter; // The character that will be moved
+    [SerializeField] GridRenderer targetRenderer;
 
     Pathfinding pathfinding; // Reference to the pathfinding system
-    List<PathNode> fullPath; // Full path from current to target position
-    List<PathNode> trimmedPath; // Trimmed path limited by character's move speed
+    List<PathNode> path; // Full path from current to target position
     Camera cam; // Reference to the camera component
+
+    float maxMoveSpeed;
 
     private void Awake()
     {
         cam = GetComponent<Camera>(); // Get the Camera component attached to the same GameObject
+        maxMoveSpeed = targetCharacter.GetComponent<Character>().MaxMoveSpeed; // Get the character's maximum movement speed
     }
 
     private void Start()
     {
         pathfinding = grid.GetComponent<Pathfinding>(); // Get the Pathfinding component from the grid
+        CheckWalkableTerrain();
+    }
+
+    private void CheckWalkableTerrain()
+    {
+        List<PathNode> walkableNodes = new List<PathNode>();
+        pathfinding.CalculateWalkableNodes(
+            targetCharacter.positionOnGrid.x,
+            targetCharacter.positionOnGrid.y,
+            maxMoveSpeed,
+            ref walkableNodes
+            );
+        targetRenderer.fieldHighlight(walkableNodes);
     }
 
     private void Update()
     {
         UnitMovement unitMovement = targetCharacter.GetComponent<UnitMovement>(); // Get the UnitMovement script on the target character
-        int maxMoveSpeed = targetCharacter.GetComponent<Character>().MaxMoveSpeed; // Get the character's maximum movement speed
 
         if (Input.GetMouseButtonDown(0)) // When left mouse button is clicked
         {
@@ -41,19 +57,13 @@ public class MoveUnit : MonoBehaviour
             {
                 Vector2Int gridPosition = grid.GetGridPosition(hit.point); // Convert hit point to grid coordinates
 
-                fullPath = pathfinding.FindPath(targetCharacter.positionOnGrid.x, targetCharacter.positionOnGrid.y, gridPosition.x, gridPosition.y); // Find path from current to clicked position
+                // path = pathfinding.FindPath(targetCharacter.positionOnGrid.x, targetCharacter.positionOnGrid.y, gridPosition.x, gridPosition.y); // Find path from current to clicked position
 
-                if (fullPath == null || fullPath.Count == 0) { return; } // If no path found, do nothing
-                if (fullPath.Count <= maxMoveSpeed) // If path is within move speed
-                {
-                    trimmedPath = fullPath; // Use full path
-                }
-                else
-                {
-                    trimmedPath = fullPath.GetRange(0, maxMoveSpeed); // Otherwise, trim path to move speed
-                }
+                path = pathfinding.TraceBackPatch(gridPosition.x, gridPosition.y);
 
-                unitMovement.Move(trimmedPath); // Tell the unit to move along the trimmed path
+                path.Reverse();
+                if (path == null || path.Count == 0) { return; } // If no path found, do nothing
+                unitMovement.Move(path); // Tell the unit to move along the trimmed path
             }
         }
     }

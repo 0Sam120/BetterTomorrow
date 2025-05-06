@@ -8,13 +8,11 @@ public class GridRenderer : MonoBehaviour
     [SerializeField] GameObject movePointContainer;
     List<GameObject> movePointGo; // List to hold spawned move point GameObjects
 
-    [SerializeField] List<Vector2Int> testTargetPosition;
 
-    private void Start()
+    private void Awake()
     {
         grid = GetComponent<GridMap>(); // Get the GridMap component attached to the same GameObject
         movePointGo = new List<GameObject>(); // Initialize the list of move points
-        fieldHighlight(testTargetPosition);
     }
 
     private GameObject CreateMovePointHighlightObject()
@@ -30,6 +28,14 @@ public class GridRenderer : MonoBehaviour
         for (int i = 0; i < position.Count; i++)
         {
             Highlight(position[i].x, position[i].y, GetMovePointGO(i));
+        }
+    }
+
+    public void fieldHighlight(List<PathNode> position)
+    {
+        for (int i = 0; i < position.Count; i++)
+        {
+            Highlight(position[i].pos_x, position[i].pos_y, GetMovePointGO(i));
         }
     }
 
