@@ -8,6 +8,8 @@ public class AnimationControlller : MonoBehaviour
     private static readonly int MoveHash = Animator.StringToHash("Move");
     private static readonly int AttackHash = Animator.StringToHash("Shoot");
 
+    bool attack;
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -23,18 +25,8 @@ public class AnimationControlller : MonoBehaviour
         animator.SetBool(MoveHash, false);
     }
 
-    public void TriggerAttack()
+    public void Attack()
     {
-        // Only allow attack if not already attacking
-        if (!animator.GetCurrentAnimatorStateInfo(0).IsTag("Shoot"))
-        {
-            animator.SetTrigger(AttackHash);
-        }
-    }
-
-    // Called by Animation Event at the end of attack animation
-    public void OnAttackComplete()
-    {
-        // Any cleanup needed after attack
+        animator.SetTrigger(AttackHash);
     }
 }

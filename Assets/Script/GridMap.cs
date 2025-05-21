@@ -122,6 +122,19 @@ public class GridMap : MonoBehaviour
         return new Vector3(x * cellSize, elevation ? grid[x, y].elevation : 0f, y * cellSize);
     }
 
+    internal void RemoveObject(Vector2Int positionOnGrid, GridObject gridObject)
+    {
+        if (CheckBoundry(positionOnGrid))
+        {
+            if (grid[positionOnGrid.x, positionOnGrid.y].gridObject != gridObject) { return; }
+            grid[positionOnGrid.x, positionOnGrid.y].gridObject = null;
+        }
+        else
+        {
+            Debug.Log("Object outside bounds");
+        }
+    }
+
     public void PlaceObject(Vector2Int positionOnGrid, GridObject gridObject)
     {
         // Place a GridObject at a specific cell
@@ -172,8 +185,19 @@ public class GridMap : MonoBehaviour
         // Convert a list of PathNodes into a list of world positions
         List<Vector3> worldPositions = new List<Vector3>();
 
+        if (path == null)
+        {
+            return worldPositions;
+        }
+
         for (int i = 0; i < path.Count; i++)
         {
+            if (path[i] == null)
+            {
+                Debug.LogWarning($"Path node at index {i} is null.");
+                continue;
+            }
+
             worldPositions.Add(GetWorldPosition(path[i].pos_x, path[i].pos_y, true));
         }
 

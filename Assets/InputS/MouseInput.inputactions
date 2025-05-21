@@ -6,7 +6,7 @@
             "id": "e0dde56f-785f-42b8-91eb-1b22321cc6c6",
             "actions": [
                 {
-                    "name": "New action",
+                    "name": "ConfirmAction",
                     "type": "Button",
                     "id": "d4ff2ac4-11d7-4272-954f-df3c2d8f2624",
                     "expectedControlType": "",
@@ -19,11 +19,11 @@
                 {
                     "name": "",
                     "id": "75c6f059-8b8c-4a9d-b4a8-a2d7589c6245",
-                    "path": "",
+                    "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "New action",
+                    "action": "ConfirmAction",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

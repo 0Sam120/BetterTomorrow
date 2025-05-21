@@ -23,11 +23,21 @@ public class UnitMovement : MonoBehaviour
 
         pathWorldPosition = m_GridObject.targetGrid.ConvertPathNodesToWorldPosition(path);
 
+        if (pathWorldPosition.Count == 0)
+        {
+            Debug.Log("Position out of movement range.");
+            return;
+        }
+
+        m_GridObject.targetGrid.RemoveObject(m_GridObject.positionOnGrid, m_GridObject);
+
         Debug.Log("Character is moving");
 
         // Update the unit's grid position to the final node of the path
         m_GridObject.positionOnGrid.x = path[path.Count - 1].pos_x;
         m_GridObject.positionOnGrid.y = path[path.Count - 1].pos_y;
+
+        m_GridObject.targetGrid.PlaceObject(m_GridObject.positionOnGrid, m_GridObject);
 
         RotateTowards(); // Face the first target
         m_AnimationControlller.StartMoving(); // Trigger move animation

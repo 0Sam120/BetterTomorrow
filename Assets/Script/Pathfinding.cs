@@ -20,6 +20,13 @@ public class PathNode
         pos_x = xPos;
         pos_y = yPos;
     }
+
+    public void Clear()
+    {
+        gValue = 0f;
+        hValue = 0f;
+        parentNode = null;
+    }
 }
 
 [RequireComponent(typeof(GridMap))]
@@ -32,6 +39,19 @@ public class Pathfinding : MonoBehaviour
     {
         Init();
     }
+
+    internal void ClearNodes()
+    {
+        for(int x = 0; x < gridMap.width; x++)
+        {
+            for(int y = 0; y < gridMap.length; y++)
+            {
+                pathNodes[x, y].Clear();
+            }
+        }
+    }
+
+    
 
     private void Init()
     {
@@ -81,7 +101,11 @@ public class Pathfinding : MonoBehaviour
             {
                 if (closedList.Contains(neighbourNodes[i])) { continue; }
                 if (gridMap.CheckWalkable(neighbourNodes[i].pos_x, neighbourNodes[i].pos_y) == false) { continue; }
+                Vector2Int pos = new Vector2Int(neighbourNodes[i].pos_x, neighbourNodes[i].pos_y);
+                GridObject occupant = gridMap.GetPlacedObject(pos);
 
+                // Tile is occupied — treat as non-walkable
+                if (occupant != null) { continue; }
                 float movmentCost = currentList.gValue + CalculateDistance(currentList, neighbourNodes[i]);
 
                 if (movmentCost > range) { continue; }

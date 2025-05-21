@@ -92,7 +92,7 @@ public partial class @MouseInput: IInputActionCollection2, IDisposable
             ""id"": ""e0dde56f-785f-42b8-91eb-1b22321cc6c6"",
             ""actions"": [
                 {
-                    ""name"": ""New action"",
+                    ""name"": ""ConfirmAction"",
                     ""type"": ""Button"",
                     ""id"": ""d4ff2ac4-11d7-4272-954f-df3c2d8f2624"",
                     ""expectedControlType"": """",
@@ -105,11 +105,11 @@ public partial class @MouseInput: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""75c6f059-8b8c-4a9d-b4a8-a2d7589c6245"",
-                    ""path"": """",
+                    ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""New action"",
+                    ""action"": ""ConfirmAction"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -168,7 +168,7 @@ public partial class @MouseInput: IInputActionCollection2, IDisposable
 }");
         // UnitCommand
         m_UnitCommand = asset.FindActionMap("UnitCommand", throwIfNotFound: true);
-        m_UnitCommand_Newaction = m_UnitCommand.FindAction("New action", throwIfNotFound: true);
+        m_UnitCommand_ConfirmAction = m_UnitCommand.FindAction("ConfirmAction", throwIfNotFound: true);
         // UnitControl
         m_UnitControl = asset.FindActionMap("UnitControl", throwIfNotFound: true);
         m_UnitControl_Select = m_UnitControl.FindAction("Select", throwIfNotFound: true);
@@ -254,7 +254,7 @@ public partial class @MouseInput: IInputActionCollection2, IDisposable
     // UnitCommand
     private readonly InputActionMap m_UnitCommand;
     private List<IUnitCommandActions> m_UnitCommandActionsCallbackInterfaces = new List<IUnitCommandActions>();
-    private readonly InputAction m_UnitCommand_Newaction;
+    private readonly InputAction m_UnitCommand_ConfirmAction;
     /// <summary>
     /// Provides access to input actions defined in input action map "UnitCommand".
     /// </summary>
@@ -267,9 +267,9 @@ public partial class @MouseInput: IInputActionCollection2, IDisposable
         /// </summary>
         public UnitCommandActions(@MouseInput wrapper) { m_Wrapper = wrapper; }
         /// <summary>
-        /// Provides access to the underlying input action "UnitCommand/Newaction".
+        /// Provides access to the underlying input action "UnitCommand/ConfirmAction".
         /// </summary>
-        public InputAction @Newaction => m_Wrapper.m_UnitCommand_Newaction;
+        public InputAction @ConfirmAction => m_Wrapper.m_UnitCommand_ConfirmAction;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -296,9 +296,9 @@ public partial class @MouseInput: IInputActionCollection2, IDisposable
         {
             if (instance == null || m_Wrapper.m_UnitCommandActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_UnitCommandActionsCallbackInterfaces.Add(instance);
-            @Newaction.started += instance.OnNewaction;
-            @Newaction.performed += instance.OnNewaction;
-            @Newaction.canceled += instance.OnNewaction;
+            @ConfirmAction.started += instance.OnConfirmAction;
+            @ConfirmAction.performed += instance.OnConfirmAction;
+            @ConfirmAction.canceled += instance.OnConfirmAction;
         }
 
         /// <summary>
@@ -310,9 +310,9 @@ public partial class @MouseInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnitCommandActions" />
         private void UnregisterCallbacks(IUnitCommandActions instance)
         {
-            @Newaction.started -= instance.OnNewaction;
-            @Newaction.performed -= instance.OnNewaction;
-            @Newaction.canceled -= instance.OnNewaction;
+            @ConfirmAction.started -= instance.OnConfirmAction;
+            @ConfirmAction.performed -= instance.OnConfirmAction;
+            @ConfirmAction.canceled -= instance.OnConfirmAction;
         }
 
         /// <summary>
@@ -461,12 +461,12 @@ public partial class @MouseInput: IInputActionCollection2, IDisposable
     public interface IUnitCommandActions
     {
         /// <summary>
-        /// Method invoked when associated input action "New action" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "ConfirmAction" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnNewaction(InputAction.CallbackContext context);
+        void OnConfirmAction(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UnitControl" which allows adding and removing callbacks.
