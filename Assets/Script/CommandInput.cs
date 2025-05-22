@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 
 public class CommandInput : MonoBehaviour
 {
+    // References to other components
     SelectCharacter selectedCharacter;
     [SerializeField] CommandType currentCommand;
 
@@ -16,13 +17,14 @@ public class CommandInput : MonoBehaviour
     CharacterAttack characterAttack;
     MouseInput mouseInput;
 
-
     private void Awake()
     {
         currentCommand = CommandType.Default;
-        
+
+        // Initialize input system
         mouseInput = new MouseInput();
-        
+
+        // Get component references
         commandManager = GetComponent<CommandManager>();
         cursorData = GetComponent<CursorData>();
         moveUnit = GetComponent<MoveUnit>();
@@ -32,22 +34,30 @@ public class CommandInput : MonoBehaviour
 
     private void OnEnable()
     {
+        // Enable input
         mouseInput.Enable();
+
+        // Register input callbacks
         mouseInput.UnitCommand.ConfirmAction.performed += HandleLeftClick;
         mouseInput.UnitControl.Deselect.performed += HandleRightClick;
     }
 
     private void OnDisable()
     {
+        // Disable input
         mouseInput.Disable();
+
+        // Unregister input callbacks
         mouseInput.UnitCommand.ConfirmAction.performed -= HandleLeftClick;
     }
 
+    // Sets the current command type
     public void SetCommandType(CommandType commandType)
     {
         currentCommand = commandType;
     }
 
+    // Initializes the command by highlighting valid areas or targets
     public void InitCommand()
     {
         switch (currentCommand)
@@ -63,6 +73,7 @@ public class CommandInput : MonoBehaviour
         }
     }
 
+    // Handles left-click input
     private void HandleLeftClick(InputAction.CallbackContext input)
     {
         switch (currentCommand)
@@ -79,27 +90,33 @@ public class CommandInput : MonoBehaviour
         }
     }
 
+    // Handles right-click input
     private void HandleRightClick(InputAction.CallbackContext input)
     {
         selectedCharacter.Deselect();
     }
 
+    // Highlights tiles that are walkable for the selected character
     public void HighlightWalkableTerrain()
     {
         moveUnit.CheckWalkableTerrain(selectedCharacter.selected);
     }
 
+    // Processes the attack command
     private void AttackCommand()
     {
         GridObject gridObject = characterAttack.GetAttackTarget(cursorData.positionOnGrid);
         if (gridObject == null) { return; }
+
         commandManager.AddAttackCommand(selectedCharacter.selected, cursorData.positionOnGrid, gridObject);
         commandManager.ExecuteCommand();
     }
 
+    // Processes the move command
     private void MoveCommand()
     {
         List<PathNode> path = moveUnit.GetPath(cursorData.positionOnGrid);
+
         commandManager.AddMoveCommand(selectedCharacter.selected, cursorData.positionOnGrid, path);
         commandManager.ExecuteCommand();
     }
