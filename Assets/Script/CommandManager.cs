@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 
+// Defines the types of commands that can be executed
 public enum CommandType
 {
     Default,
@@ -9,11 +10,12 @@ public enum CommandType
     Attack
 }
 
+// Represents a command to be executed by a character
 public class Command
 {
-    public Character character;
-    public Vector2Int selectedGrid;
-    public CommandType type;
+    public Character character;              // The character performing the command
+    public Vector2Int selectedGrid;          // Target grid position for the command
+    public CommandType type;                 // Type of command (Move or Attack)
 
     public Command(Character character, Vector2Int selectedGrid, CommandType type)
     {
@@ -22,20 +24,22 @@ public class Command
         this.type = type;
     }
 
-    public List<PathNode> path;
-    public GridObject target;
+    public List<PathNode> path;              // Path to follow (for MoveTo)
+    public GridObject target;                // Target object (for Attack)
 }
 
+// Handles execution of move and attack commands
 public class CommandManager : MonoBehaviour
 {
-    public Command currentCommand;
-    ClearUtility clearUtility;
+    public Command currentCommand;           // Currently active command
+    ClearUtility clearUtility;              // Utility to clear grid highlights and paths
 
     private void Awake()
     {
         clearUtility = GetComponent<ClearUtility>();
     }
 
+    // Executes the current command based on its type
     public void ExecuteCommand()
     {
         switch (currentCommand.type)
@@ -49,6 +53,7 @@ public class CommandManager : MonoBehaviour
         }
     }
 
+    // Executes an attack command
     public void ExecuteAttackCommand()
     {
         Debug.Log("Shoot");
@@ -57,11 +62,13 @@ public class CommandManager : MonoBehaviour
         currentCommand = null;
         clearUtility.ClearGridHighlightAttack();
     }
-    
+
+    // Executes a move command
     public void ExecuteMoveCommand()
     {
         Character receiver = currentCommand.character;
         receiver.GetComponent<UnitMovement>().Move(currentCommand.path);
+
         if (receiver.GetComponent<UnitMovement>().isMoving)
         {
             clearUtility.ClearPathfinding();
@@ -74,12 +81,14 @@ public class CommandManager : MonoBehaviour
         }
     }
 
+    // Sets up a move command with path information
     public void AddMoveCommand(Character character, Vector2Int selectedGrid, List<PathNode> path)
     {
         currentCommand = new Command(character, selectedGrid, CommandType.MoveTo);
         currentCommand.path = path;
     }
 
+    // Sets up an attack command with a target
     public void AddAttackCommand(Character attacker, Vector2Int selectGrid, GridObject target)
     {
         currentCommand = new Command(attacker, selectGrid, CommandType.Attack);
