@@ -7,9 +7,11 @@ public class AttackComponent : MonoBehaviour
 
     // Reference to the character's animation controller
     AnimationControlller characterAnimator;
+    Character character;
 
     private void Awake()
     {
+        character = GetComponent<Character>();
         // Get the GridObject component attached to this GameObject
         gridObject = GetComponent<GridObject>();
 
@@ -18,12 +20,24 @@ public class AttackComponent : MonoBehaviour
     }
 
     // Called when this character attacks a target on the grid
-    public void AttackPosition(GridObject targetGridObject)
+    public void AttackPosition(GridObject targetGridObject, int total)
     {
         Debug.Log("Target Found");
 
         // Rotate this character to face the target
         RotateCharacter(targetGridObject.transform.position);
+        if(total >= targetGridObject.GetComponent<Character>().AC)
+        {
+            // If the attack hits, deal damage to the target character
+            int damage = Random.Range(1, character.DMG) + character.DMGMod; // Get the damage value from this character
+            targetGridObject.GetComponent<Character>().TakeDamage(damage);
+            Debug.Log($"{character.Name} attacks {targetGridObject.GetComponent<Character>().Name} for {damage} damage!");
+        }
+        else
+        {
+            // If the attack misses, log a message
+            Debug.Log($"{character.Name} attacks {targetGridObject.GetComponent<Character>().Name} but misses!");
+        }
 
         // Play the attack animation
         characterAnimator.Attack();

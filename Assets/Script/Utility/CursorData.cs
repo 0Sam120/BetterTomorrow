@@ -17,9 +17,6 @@ public class CursorData : MonoBehaviour
 
     private void Update()
     {
-        // If the cursor is over a UI element, skip grid detection
-        if (EventSystem.current.IsPointerOverGameObject()) { return; }
-
         // Create a ray from the mouse position into the scene
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
 

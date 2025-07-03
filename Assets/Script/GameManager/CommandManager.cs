@@ -58,7 +58,14 @@ public class CommandManager : MonoBehaviour
     {
         Debug.Log("Shoot");
         Character receiver = currentCommand.character;
-        receiver.GetComponent<AttackComponent>().AttackPosition(currentCommand.target);
+
+        if (!receiver.GetComponent<CharacterTurn>().SpendMomentum(2))
+        {
+            return;
+        }
+
+        int total = receiver.RollToHit();
+        receiver.GetComponent<AttackComponent>().AttackPosition(currentCommand.target, total);
         currentCommand = null;
         clearUtility.ClearGridHighlightAttack();
     }
@@ -67,18 +74,24 @@ public class CommandManager : MonoBehaviour
     public void ExecuteMoveCommand()
     {
         Character receiver = currentCommand.character;
+        var characterTurn = receiver.GetComponent<CharacterTurn>();
+
+        // Check both requirements BEFORE executing anything
+        bool canSpend = characterTurn.CanSpendMomentum(2);
+        bool pathIsValid = receiver.GetComponent<UnitMovement>().PathIsValid(currentCommand.path);
+
+        if (!canSpend || !pathIsValid)
+        {
+            return; // Abort if either fails
+        }
+
+        // Now we can spend momentum and move
+        characterTurn.SpendMomentum(2);
         receiver.GetComponent<UnitMovement>().Move(currentCommand.path);
 
-        if (receiver.GetComponent<UnitMovement>().isMoving)
-        {
-            clearUtility.ClearPathfinding();
-            clearUtility.ClearGridHighlightMove();
-            currentCommand = null;
-        }
-        else
-        {
-            return;
-        }
+        clearUtility.ClearPathfinding();
+        clearUtility.ClearGridHighlightMove();
+        currentCommand = null;
     }
 
     // Sets up a move command with path information

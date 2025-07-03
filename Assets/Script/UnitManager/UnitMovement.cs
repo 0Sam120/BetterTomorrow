@@ -17,17 +17,10 @@ public class UnitMovement : MonoBehaviour
     }
 
     // Initiates movement along a given path
-    internal void Move(List<PathNode> path)
+    internal bool Move(List<PathNode> path)
     {
-        if (isMoving) return; // Prevent movement override if already moving
 
         pathWorldPosition = m_GridObject.targetGrid.ConvertPathNodesToWorldPosition(path);
-
-        if (pathWorldPosition.Count == 0)
-        {
-            Debug.Log("Position out of movement range.");
-            return;
-        }
 
         m_GridObject.targetGrid.RemoveObject(m_GridObject.positionOnGrid, m_GridObject);
 
@@ -42,6 +35,8 @@ public class UnitMovement : MonoBehaviour
         RotateTowards(); // Face the first target
         m_AnimationControlller.StartMoving(); // Trigger move animation
         isMoving = true;
+
+        return true;
     }
 
     private void Update()
@@ -73,6 +68,15 @@ public class UnitMovement : MonoBehaviour
     public bool IsMoving()
     {
         return isMoving;
+    }
+
+    public bool PathIsValid(List<PathNode> path)
+    {
+        if (isMoving) return false;
+
+        var pathWorldPosition = m_GridObject.targetGrid.ConvertPathNodesToWorldPosition(path);
+
+        return pathWorldPosition.Count != 0;
     }
 
     // Rotates the unit to face the next movement target

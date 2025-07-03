@@ -996,6 +996,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -2118035285197553157, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
+      propertyPath: turnManager
+      value: 
+      objectReference: {fileID: 1015505650}
+    - target: {fileID: 379471144661578149, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
+      propertyPath: AC
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 379471144661578149, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
+      propertyPath: DMG
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 379471144661578149, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
       propertyPath: Name
       value: Bandit
@@ -1577,8 +1589,9 @@ GameObject:
   - component: {fileID: 1015505647}
   - component: {fileID: 1015505648}
   - component: {fileID: 1015505649}
+  - component: {fileID: 1015505650}
   m_Layer: 0
-  m_Name: --GameManager--
+  m_Name: GameManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1713,6 +1726,25 @@ MonoBehaviour:
   targetPF: {fileID: 1255818866}
   attackHighlight: {fileID: 2073581734}
   moveHighlight: {fileID: 248924816}
+--- !u!114 &1015505650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1015505639}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c969171d7dc3bde4aaed3565de79d772, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ActiveUnits: []
+  PlayerTeam: []
+  EnemyTeam: []
+  currentUnit: {fileID: 0}
+  state: 0
+  combatRound: 0
+  currentInitiativeIndex: 0
 --- !u!20 &1024620985 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 8082199755481139160, guid: 2f70664f93454c144ac39b7695a6fbbe, type: 3}
@@ -3021,6 +3053,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -2118035285197553157, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
+      propertyPath: turnManager
+      value: 
+      objectReference: {fileID: 1015505650}
+    - target: {fileID: 379471144661578149, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
+      propertyPath: DMG
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 379471144661578149, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
       propertyPath: Name
       value: Kaiden
