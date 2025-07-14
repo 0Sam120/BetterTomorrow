@@ -35,7 +35,7 @@ public class GridRenderer : MonoBehaviour
     {
         for (int i = 0; i < position.Count; i++)
         {
-            Highlight(position[i].pos_x, position[i].pos_y, GetPointGO(i));
+            Highlight(position[i].x, position[i].y, GetPointGO(i));
         }
     }
 

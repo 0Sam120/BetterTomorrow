@@ -1013,8 +1013,20 @@ PrefabInstance:
       value: Bandit
       objectReference: {fileID: 0}
     - target: {fileID: 379471144661578149, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
+      propertyPath: team
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 379471144661578149, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
+      propertyPath: atkRange
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 379471144661578149, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
       propertyPath: MaxMoveSpeed
-      value: 30
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 379471144661578149, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
+      propertyPath: InitiativeMod
+      value: -2
       objectReference: {fileID: 0}
     - target: {fileID: 3766252343236792873, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
       propertyPath: m_Name
@@ -1024,6 +1036,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5539761312832657301, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
+      propertyPath: targetGrid
+      value: 
+      objectReference: {fileID: 1255818863}
     - target: {fileID: 6415032606466757069, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
       propertyPath: targetGrid
       value: 
@@ -1723,7 +1739,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ac6a682e8b1b4d4e897676b80253b7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetPF: {fileID: 1255818866}
   attackHighlight: {fileID: 2073581734}
   moveHighlight: {fileID: 248924816}
 --- !u!114 &1015505650
@@ -1742,6 +1757,7 @@ MonoBehaviour:
   PlayerTeam: []
   EnemyTeam: []
   currentUnit: {fileID: 0}
+  AI: {fileID: 0}
   state: 0
   combatRound: 0
   currentInitiativeIndex: 0
@@ -1998,7 +2014,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1255818864}
   - component: {fileID: 1255818863}
-  - component: {fileID: 1255818866}
   m_Layer: 0
   m_Name: GridMap
   m_TagString: Untagged
@@ -2048,18 +2063,6 @@ Transform:
   - {fileID: 46119142}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1255818866
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1255818862}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c95ff12aa5f4aad41b6ca6d2e2b313e5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1569867593
 GameObject:
   m_ObjectHideFlags: 0
@@ -3066,8 +3069,16 @@ PrefabInstance:
       value: Kaiden
       objectReference: {fileID: 0}
     - target: {fileID: 379471144661578149, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
+      propertyPath: atkRange
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 379471144661578149, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
       propertyPath: MaxMoveSpeed
-      value: 30
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 379471144661578149, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
+      propertyPath: InitiativeMod
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 3766252343236792873, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
       propertyPath: m_Name
@@ -3077,13 +3088,17 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5539761312832657301, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
+      propertyPath: targetGrid
+      value: 
+      objectReference: {fileID: 1255818863}
     - target: {fileID: 6415032606466757069, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
       propertyPath: targetGrid
       value: 
       objectReference: {fileID: 1255818863}
     - target: {fileID: 8389695597694891577, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 16.987
+      value: 16.91
       objectReference: {fileID: 0}
     - target: {fileID: 8389695597694891577, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3091,7 +3106,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8389695597694891577, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 13.113
+      value: 12.88
       objectReference: {fileID: 0}
     - target: {fileID: 8389695597694891577, guid: 31251a459a5d1ab458611ead2155bb04, type: 3}
       propertyPath: m_LocalRotation.w

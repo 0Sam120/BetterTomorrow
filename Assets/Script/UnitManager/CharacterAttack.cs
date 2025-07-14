@@ -25,21 +25,7 @@ public class CharacterAttack : MonoBehaviour
         mouseInput = new MouseInput();
         cam = GetComponent<Camera>();
     }
-
-    private void OnEnable()
-    {
-        // Enable input actions when this component is enabled
-        mouseInput.UnitCommand.Enable();
-        mouseInput.UnitCommand.ConfirmAction.performed += Attack;
-    }
-
-    private void OnDisable()
-    {
-        // Disable input actions when this component is disabled
-        mouseInput.UnitCommand.Disable();
-        mouseInput.UnitCommand.ConfirmAction.performed -= Attack;
-    }
-
+    
     // Calculates all grid positions within the character's attack range
     public void CalculateAttackArea(Vector2Int characterPositionOnGrid, int attackRange)
     {

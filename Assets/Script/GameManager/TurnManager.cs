@@ -19,6 +19,7 @@ public class TurnManager : MonoBehaviour
     public List<Character> EnemyTeam = new List<Character>();
 
     public Character currentUnit;
+    public AIManager AI;
     public GameState state;
     public int combatRound = 0;
     public int currentInitiativeIndex = 0;
@@ -114,6 +115,18 @@ public class TurnManager : MonoBehaviour
 
     public void HandleEnemyTurn()
     {
+        if (currentUnit == null)
+        {
+            Debug.LogError("Current unit is null in HandleEnemyTurn");
+            return;
+        }
+        AI = currentUnit.GetComponent<AIManager>();
+        if (AI == null)
+        {
+            Debug.LogError("AI is null in HandleEnemyTurn");
+            return;
+        }
+
         state = GameState.EnemyTurn;
         Debug.Log("Enemy's turn started");
     }

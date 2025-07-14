@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GridMap : MonoBehaviour
+public class GridMap : MonoBehaviour, IGridMap
 {
     Node[,] grid; // 2D array to hold all grid nodes
     public int width = 25; // Number of cells along the width
@@ -174,33 +174,25 @@ public class GridMap : MonoBehaviour
         return true;
     }
 
-    public bool CheckWalkable(int pos_x, int pos_y)
+    public bool CheckWalkable(Vector2Int pos)
     {
         // Return whether a cell is walkable
-        return grid[pos_x, pos_y].passable;
+        return grid[pos.x, pos.y].passable;
     }
 
-    public List<Vector3> ConvertPathNodesToWorldPosition(List<PathNode> path)
+    public List<Vector3> ConvertPathToWorldPosition(List<Vector2Int> path)
     {
-        // Convert a list of PathNodes into a list of world positions
         List<Vector3> worldPositions = new List<Vector3>();
 
         if (path == null)
-        {
             return worldPositions;
-        }
 
-        for (int i = 0; i < path.Count; i++)
+        foreach (var tilePos in path)
         {
-            if (path[i] == null)
-            {
-                Debug.LogWarning($"Path node at index {i} is null.");
-                continue;
-            }
-
-            worldPositions.Add(GetWorldPosition(path[i].pos_x, path[i].pos_y, true));
+            worldPositions.Add(GetWorldPosition(tilePos.x, tilePos.y, true));
         }
 
         return worldPositions;
     }
+
 }

@@ -17,18 +17,15 @@ public class UnitMovement : MonoBehaviour
     }
 
     // Initiates movement along a given path
-    internal bool Move(List<PathNode> path)
+    internal bool Move(List<Vector2Int> path)
     {
-
-        pathWorldPosition = m_GridObject.targetGrid.ConvertPathNodesToWorldPosition(path);
+        pathWorldPosition = m_GridObject.targetGrid.ConvertPathToWorldPosition(path);
 
         m_GridObject.targetGrid.RemoveObject(m_GridObject.positionOnGrid, m_GridObject);
 
-        Debug.Log("Character is moving");
-
         // Update the unit's grid position to the final node of the path
-        m_GridObject.positionOnGrid.x = path[path.Count - 1].pos_x;
-        m_GridObject.positionOnGrid.y = path[path.Count - 1].pos_y;
+        m_GridObject.positionOnGrid.x = path[path.Count - 1].x;
+        m_GridObject.positionOnGrid.y = path[path.Count - 1].y;
 
         m_GridObject.targetGrid.PlaceObject(m_GridObject.positionOnGrid, m_GridObject);
 
@@ -70,11 +67,11 @@ public class UnitMovement : MonoBehaviour
         return isMoving;
     }
 
-    public bool PathIsValid(List<PathNode> path)
+    public bool PathIsValid(List<Vector2Int> path)
     {
         if (isMoving) return false;
 
-        var pathWorldPosition = m_GridObject.targetGrid.ConvertPathNodesToWorldPosition(path);
+        var pathWorldPosition = m_GridObject.targetGrid.ConvertPathToWorldPosition(path);
 
         return pathWorldPosition.Count != 0;
     }

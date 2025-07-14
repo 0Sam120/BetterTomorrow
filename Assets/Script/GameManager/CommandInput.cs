@@ -115,7 +115,16 @@ public class CommandInput : MonoBehaviour
     // Processes the move command
     private void MoveCommand()
     {
-        List<PathNode> path = moveUnit.GetPath(cursorData.positionOnGrid);
+        Vector2Int startPos;
+        if (selectedCharacter == null)
+        {
+            Debug.LogError("No character selected for movement.");
+            return;
+        }
+
+        startPos = selectedCharacter.selected.GetComponent<GridObject>().positionOnGrid;
+
+        List<Vector2Int> path = moveUnit.GetPath(startPos, cursorData.positionOnGrid);
 
         commandManager.AddMoveCommand(selectedCharacter.selected, cursorData.positionOnGrid, path);
         commandManager.ExecuteCommand();

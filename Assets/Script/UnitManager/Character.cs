@@ -10,7 +10,7 @@ public enum Team
 public class Character : MonoBehaviour
 {
     public string Name = "NaN";
-    public float MaxMoveSpeed = 50f;
+    public float MaxMoveSpeed = 5f;
     public int HP = 100;
     public int AC = 14;
     public int atkRange = 5;
@@ -24,7 +24,6 @@ public class Character : MonoBehaviour
 
     void OnEnable() => UnitRegistry.Register(this);
     void OnDisable() => UnitRegistry.Deregister(this);
-
     public bool IsAlive()
     {
         if (HP <= 0)

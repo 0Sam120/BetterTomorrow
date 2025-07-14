@@ -24,7 +24,7 @@ public class Command
         this.type = type;
     }
 
-    public List<PathNode> path;              // Path to follow (for MoveTo)
+    public List<Vector2Int> path;              // Path to follow (for MoveTo)
     public GridObject target;                // Target object (for Attack)
 }
 
@@ -32,11 +32,10 @@ public class Command
 public class CommandManager : MonoBehaviour
 {
     public Command currentCommand;           // Currently active command
-    ClearUtility clearUtility;              // Utility to clear grid highlights and paths
 
     private void Awake()
     {
-        clearUtility = GetComponent<ClearUtility>();
+        
     }
 
     // Executes the current command based on its type
@@ -67,7 +66,6 @@ public class CommandManager : MonoBehaviour
         int total = receiver.RollToHit();
         receiver.GetComponent<AttackComponent>().AttackPosition(currentCommand.target, total);
         currentCommand = null;
-        clearUtility.ClearGridHighlightAttack();
     }
 
     // Executes a move command
@@ -89,13 +87,11 @@ public class CommandManager : MonoBehaviour
         characterTurn.SpendMomentum(2);
         receiver.GetComponent<UnitMovement>().Move(currentCommand.path);
 
-        clearUtility.ClearPathfinding();
-        clearUtility.ClearGridHighlightMove();
         currentCommand = null;
     }
 
     // Sets up a move command with path information
-    public void AddMoveCommand(Character character, Vector2Int selectedGrid, List<PathNode> path)
+    public void AddMoveCommand(Character character, Vector2Int selectedGrid, List<Vector2Int> path)
     {
         currentCommand = new Command(character, selectedGrid, CommandType.MoveTo);
         currentCommand.path = path;

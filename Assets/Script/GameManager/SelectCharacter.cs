@@ -65,7 +65,6 @@ public class SelectCharacter : MonoBehaviour
     // Called when Attack command is selected from menu
     public void AttackCommandSelected()
     {
-        clearUtility.ClearPathfinding();
         clearUtility.ClearGridHighlightMove();
         input.SetCommandType(CommandType.Attack);
         input.InitCommand();
