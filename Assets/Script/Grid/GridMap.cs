@@ -10,10 +10,13 @@ public class GridMap : MonoBehaviour, IGridMap
     [SerializeField] float cellSize = 1f; // Size of each cell
     [SerializeField] LayerMask obstacle; // Layer used to detect obstacles
     [SerializeField] LayerMask terrain; // Layer used to detect terrain
+    [SerializeField] private LayerMask coverLayer; // Layer for cover props (walls, fences, etc.)
+    [SerializeField] private GameObject shieldSpritePrefab; // Visual marker
 
     private void Awake()
     {
         GenerateGrid(); // Create the grid when the scene starts
+        PopulateCover(); // Populate cover information for each cell
     }
 
     private void GenerateGrid()
@@ -24,7 +27,40 @@ public class GridMap : MonoBehaviour, IGridMap
         {
             for (int x = 0; x < length; x++)
             {
-                grid[x, y] = new Node(); // Create a new Node at each cell
+                Node node = new Node();
+                grid[x, y] = node; // Create a new Node at each cell
+
+                if(y > 0)
+                {
+                    Node northNeighbour = grid[x, y - 1];
+                    NodeEdge edge = new NodeEdge
+                    {
+                        from = node,
+                        to = northNeighbour,
+                        coverType = CoverType.None,
+                        blocksMovement = false,
+                        blocksLineOfSight = false
+                    };
+
+                    node.edges[0] = edge; // North edge
+                    northNeighbour.edges[2] = edge; // South edge
+                }
+
+                if(x > 0)
+                {
+                    Node westNeighbour = grid[x - 1, y];
+                    NodeEdge edge = new NodeEdge
+                    {
+                        from = node,
+                        to = westNeighbour,
+                        coverType = CoverType.None,
+                        blocksMovement = false,
+                        blocksLineOfSight = false
+                    };
+
+                    node.edges[3] = edge; // West edge
+                    westNeighbour.edges[1] = edge; // East edge
+                }
             }
         }
 
@@ -76,6 +112,52 @@ public class GridMap : MonoBehaviour, IGridMap
                 grid[x, y].passable = passable; // Mark node as passable or not
             }
         }
+    }
+
+    private void PopulateCover()
+    {
+        var props = FindObjectsByType<CoverProp>(FindObjectsSortMode.None);
+
+        foreach(var prop in props)
+        {
+            if(CheckBoundry(prop.nodeA) == false || CheckBoundry(prop.nodeB) == false)
+            {
+                Debug.LogWarning($"CoverProp {prop.name} is out of bounds: A({prop.nodeA}) B({prop.nodeB})");
+                continue;
+            }
+
+            Node a = grid[prop.nodeA.x, prop.nodeA.y];
+            Node b = grid[prop.nodeB.x, prop.nodeB.y];
+
+            Vector2Int delta = prop.nodeB - prop.nodeA;
+            int dirFromA = DirectionToIndex(delta);
+            int dirFromB = (dirFromA + 2) % 4; // Opposite direction
+
+            NodeEdge edge = a.edges[dirFromA];
+            if (edge == null) continue;
+
+            edge.coverType = prop.coverType; // Set cover type
+            edge.blocksLineOfSight = true;
+
+            Vector3 posA = GetWorldPosition(prop.nodeA.x, prop.nodeA.y);
+            Vector3 posB = GetWorldPosition(prop.nodeB.x, prop.nodeB.y);
+            Vector3 centre = (posA + posB) / 2;
+            Vector3 forward = (posB - posA).normalized;
+
+            Instantiate(shieldSpritePrefab, centre + Vector3.up * 1.5f, Quaternion.LookRotation(forward));
+        }
+
+    }
+
+
+    int DirectionToIndex(Vector2Int offset)
+    {
+        if (offset == Vector2Int.up) return 0;    // North
+        if (offset == Vector2Int.right) return 1; // East
+        if (offset == Vector2Int.down) return 2;  // South
+        if (offset == Vector2Int.left) return 3;  // West
+        Debug.LogWarning("Invalid offset: " + offset);
+        return -1;
     }
 
     public Vector2Int GetGridPosition(Vector3 worldPosition)

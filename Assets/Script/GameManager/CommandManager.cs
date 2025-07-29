@@ -32,11 +32,13 @@ public class Command
 public class CommandManager : MonoBehaviour
 {
     public Command currentCommand;           // Currently active command
+    ClearUtility clearUtility;
 
     private void Awake()
     {
-        
+        clearUtility = GetComponent<ClearUtility>();
     }
+
 
     // Executes the current command based on its type
     public void ExecuteCommand()
@@ -63,6 +65,7 @@ public class CommandManager : MonoBehaviour
             return;
         }
 
+        clearUtility.FullClear();
         int total = receiver.RollToHit();
         receiver.GetComponent<AttackComponent>().AttackPosition(currentCommand.target, total);
         currentCommand = null;
@@ -85,6 +88,7 @@ public class CommandManager : MonoBehaviour
 
         // Now we can spend momentum and move
         characterTurn.SpendMomentum(2);
+        clearUtility.FullClear(); // Clear any previous highlights
         receiver.GetComponent<UnitMovement>().Move(currentCommand.path);
 
         currentCommand = null;

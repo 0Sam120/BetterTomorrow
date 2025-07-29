@@ -110,6 +110,7 @@ public class CommandInput : MonoBehaviour
 
         commandManager.AddAttackCommand(selectedCharacter.selected, cursorData.positionOnGrid, gridObject);
         commandManager.ExecuteCommand();
+        currentCommand = CommandType.Default; // Reset command after execution
     }
 
     // Processes the move command
@@ -128,5 +129,6 @@ public class CommandInput : MonoBehaviour
 
         commandManager.AddMoveCommand(selectedCharacter.selected, cursorData.positionOnGrid, path);
         commandManager.ExecuteCommand();
+        currentCommand = CommandType.Default; // Reset command after execution
     }
 }

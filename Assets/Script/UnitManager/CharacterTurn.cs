@@ -7,6 +7,7 @@ public class CharacterTurn : MonoBehaviour
     public int momentumGains;
     public int maxMomentumGained;
 
+
     public void GrantTurn()
     {
         Momentum = 4;
@@ -53,6 +54,7 @@ public class CharacterTurn : MonoBehaviour
 
     public void AutomaticTurnEnd()
     {
-        turnManager.EndCurrentUnitTurn();
+        TurnManager.Instance.EndCurrentUnitTurn();
+        Debug.Log($"{gameObject.name} has automatically ended their turn.");
     }
 }

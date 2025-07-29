@@ -172,6 +172,7 @@ public class Pathfinder
             current = current.parent;
         }
 
+        path.Reverse();
         return path;
     }
 

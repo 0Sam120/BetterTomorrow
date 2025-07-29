@@ -9,7 +9,9 @@ public enum GameState
     PlayerTurn,
     EnemyTurn,
     CheckWinCondition,
-    CombatEnd
+    CombatEnd,
+    Awaiting,
+    Busy
 }
 
 public class TurnManager : MonoBehaviour
@@ -18,15 +20,32 @@ public class TurnManager : MonoBehaviour
     public List<Character> PlayerTeam = new List<Character>();
     public List<Character> EnemyTeam = new List<Character>();
 
+    public static TurnManager Instance { get; private set; }
+
     public Character currentUnit;
+    public CommandMenu commandMenu;
     public AIManager AI;
     public GameState state;
     public int combatRound = 0;
     public int currentInitiativeIndex = 0;
+    private bool isEndingTurn = false;
+    AnimatorProxy proxy;
+
+    private void Awake()
+    {
+        commandMenu = GetComponent<CommandMenu>();
+        if (Instance != null && Instance != this)
+        {
+            Destroy(this);
+            return;
+        }
+        Instance = this;
+    }
 
     void Start()
     {
         state = GameState.Setup;
+        new WaitForSeconds(3f);
         StartCombat();
     }
 
@@ -70,14 +89,17 @@ public class TurnManager : MonoBehaviour
 
     void ProcessCurrentUnit()
     {
-        Debug.Log($"Round {combatRound} - {currentUnit.name}'s turn (Initiative {currentInitiativeIndex + 1}/{ActiveUnits.Count})");
+        Debug.Log($"Round {combatRound} - {currentUnit.name}'s turn (Initiative {currentInitiativeIndex + 1}/{ActiveUnits.Count}), belonging to team {currentUnit.team}");
+        new WaitForSeconds(5f); // Simulate a delay for processing
 
-        if(currentUnit.team == Team.Player)
+        if (currentUnit.team == Team.Player)
         {
+            state = GameState.PlayerTurn;
             HandlePlayerTurn();
         }
         else
         {
+            state = GameState.EnemyTurn;
             HandleEnemyTurn();
         }
     }
@@ -108,7 +130,6 @@ public class TurnManager : MonoBehaviour
 
     public void HandlePlayerTurn()
     {
-        state = GameState.PlayerTurn;
         currentUnit.GetComponent<CharacterTurn>().GrantTurn();
         Debug.Log("Player's turn started");
     }
@@ -120,29 +141,42 @@ public class TurnManager : MonoBehaviour
             Debug.LogError("Current unit is null in HandleEnemyTurn");
             return;
         }
-        AI = currentUnit.GetComponent<AIManager>();
-        if (AI == null)
+        var ai = currentUnit.GetComponent<AIManager>();
+        if (ai == null)
         {
             Debug.LogError("AI is null in HandleEnemyTurn");
             return;
         }
 
-        state = GameState.EnemyTurn;
-        Debug.Log("Enemy's turn started");
+        ai.GetComponent<CharacterTurn>().GrantTurn();
+        ai.HandleAITurn(currentUnit);
     }
 
     public void EndCurrentUnitTurn()
     {
-        Debug.Log($"{currentUnit.name}'s turn ended");
-        currentInitiativeIndex++;
-        if (currentInitiativeIndex >= ActiveUnits.Count)
+        if (isEndingTurn) return;
+        isEndingTurn = true;
+
+        proxy = new AnimatorProxy(currentUnit.GetComponentInChildren<Animator>(), this);
+        proxy.WaitUntilAnimationStops(() =>
         {
-            IncrementRounds();
+            commandMenu.ClosePanel();
+            state = GameState.Awaiting;
+            Debug.Log($"{currentUnit.name}'s turn ended");
+
+            currentInitiativeIndex++;
+            if (currentInitiativeIndex >= ActiveUnits.Count)
+            {
+                isEndingTurn = false;
+                IncrementRounds();
+            }
+            else
+            {
+                currentUnit = ActiveUnits[currentInitiativeIndex];
+                isEndingTurn = false;
+                ProcessCurrentUnit();
+            }
         }
-        else
-        {
-            currentUnit = ActiveUnits[currentInitiativeIndex];
-            ProcessCurrentUnit();
-        }
+        );
     }
 }

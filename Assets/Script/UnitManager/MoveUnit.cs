@@ -33,7 +33,7 @@ public class MoveUnit : MonoBehaviour
         targetRenderer.fieldHighlight(reachableTiles);
     }
 
-    public List<Vector2Int> GetPath(Vector2Int to, Vector2Int from)
+    public List<Vector2Int> GetPath(Vector2Int from, Vector2Int to)
     {
         // from = origin, to = target destination
         var path = pathfinder.FindPath(from, to);
