@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using static TurnManager;
 
@@ -22,13 +23,18 @@ public class Character : MonoBehaviour
     public int Initiative;
     public int damageTaken;
     public Team team;
+    private HealthBar healthBar;
+    public static event System.Action<Character> OnCharacterDeath;
 
     void OnEnable() => UnitRegistry.Register(this);
     void OnDisable() => UnitRegistry.Deregister(this);
 
     public void Awake()
     {
+        healthBar = GetComponentInChildren<HealthBar>();
         HP = maxHP; // Initialize HP to max at start
+        healthBar.SetName(Name);
+        healthBar.UpdateHealthBar(HP, maxHP);
     }
     public bool IsAlive()
     {
@@ -53,12 +59,33 @@ public class Character : MonoBehaviour
         HP -= damage;
         if (HP <= 0)
         {
-            Debug.Log($"{Name} has been defeated");
-            Destroy(this);
+            Die();
         }
         else
         {
-            Debug.Log($"{Name} took {damage} damage, remaining HP: {HP}");
+            healthBar.UpdateHealthBar(HP, maxHP);
         }
     }
+
+    private void Die()
+    {
+        // Notify all systems BEFORE destroying
+        OnCharacterDeath?.Invoke(this);
+
+        // Play death animation/effects before destroying
+        StartCoroutine(DeathSequence());
+    }
+
+    private IEnumerator DeathSequence()
+    {
+
+        var combatLog = FindAnyObjectByType<CombatLog>();
+
+        combatLog.LogUnitDeath(Name);
+
+        yield return new WaitForSeconds(1f);
+
+        Destroy(gameObject);
+    }
+
 }

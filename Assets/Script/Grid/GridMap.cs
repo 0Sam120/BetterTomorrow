@@ -116,36 +116,36 @@ public class GridMap : MonoBehaviour, IGridMap
 
     private void PopulateCover()
     {
-        var props = FindObjectsByType<CoverProp>(FindObjectsSortMode.None);
+        //var props = FindObjectsByType<CoverProp>(FindObjectsSortMode.None);
 
-        foreach(var prop in props)
-        {
-            if(CheckBoundry(prop.nodeA) == false || CheckBoundry(prop.nodeB) == false)
-            {
-                Debug.LogWarning($"CoverProp {prop.name} is out of bounds: A({prop.nodeA}) B({prop.nodeB})");
-                continue;
-            }
+        //foreach(var prop in props)
+        //{
+        //    if(CheckBoundry(prop.nodeA) == false || CheckBoundry(prop.nodeB) == false)
+        //    {
+        //        Debug.LogWarning($"CoverProp {prop.name} is out of bounds: A({prop.nodeA}) B({prop.nodeB})");
+        //        continue;
+        //    }
 
-            Node a = grid[prop.nodeA.x, prop.nodeA.y];
-            Node b = grid[prop.nodeB.x, prop.nodeB.y];
+        //    Node a = grid[prop.nodeA.x, prop.nodeA.y];
+        //    Node b = grid[prop.nodeB.x, prop.nodeB.y];
 
-            Vector2Int delta = prop.nodeB - prop.nodeA;
-            int dirFromA = DirectionToIndex(delta);
-            int dirFromB = (dirFromA + 2) % 4; // Opposite direction
+        //    Vector2Int delta = prop.nodeB - prop.nodeA;
+        //    int dirFromA = DirectionToIndex(delta);
+        //    int dirFromB = (dirFromA + 2) % 4; // Opposite direction
 
-            NodeEdge edge = a.edges[dirFromA];
-            if (edge == null) continue;
+        //    NodeEdge edge = a.edges[dirFromA];
+        //    if (edge == null) continue;
 
-            edge.coverType = prop.coverType; // Set cover type
-            edge.blocksLineOfSight = true;
+        //    edge.coverType = prop.coverType; // Set cover type
+        //    edge.blocksLineOfSight = true;
 
-            Vector3 posA = GetWorldPosition(prop.nodeA.x, prop.nodeA.y);
-            Vector3 posB = GetWorldPosition(prop.nodeB.x, prop.nodeB.y);
-            Vector3 centre = (posA + posB) / 2;
-            Vector3 forward = (posB - posA).normalized;
+        //    Vector3 posA = GetWorldPosition(prop.nodeA.x, prop.nodeA.y);
+        //    Vector3 posB = GetWorldPosition(prop.nodeB.x, prop.nodeB.y);
+        //    Vector3 centre = (posA + posB) / 2;
+        //    Vector3 forward = (posB - posA).normalized;
 
-            Instantiate(shieldSpritePrefab, centre + Vector3.up * 1.5f, Quaternion.LookRotation(forward));
-        }
+        //    Instantiate(shieldSpritePrefab, centre + Vector3.up * 1.5f, Quaternion.LookRotation(forward));
+        //}
 
     }
 

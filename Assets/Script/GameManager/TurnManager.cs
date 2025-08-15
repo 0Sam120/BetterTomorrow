@@ -1,7 +1,10 @@
+using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
+using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public enum GameState
 {
@@ -16,6 +19,14 @@ public enum GameState
 
 public class TurnManager : MonoBehaviour
 {
+
+    [SerializeField] private GameObject resultScreen;
+    [SerializeField] private TextMeshProUGUI resultTitle;
+    [SerializeField] private TextMeshProUGUI scoreText;
+    [SerializeField] private TextMeshProUGUI rankText;
+    [SerializeField] private Button restartButton;
+    [SerializeField] private Button quitButton;
+
     public List<Character> ActiveUnits = new List<Character>();
     public List<Character> PlayerTeam = new List<Character>();
     public List<Character> EnemyTeam = new List<Character>();
@@ -30,9 +41,12 @@ public class TurnManager : MonoBehaviour
     public int currentInitiativeIndex = 0;
     private bool isEndingTurn = false;
     AnimatorProxy proxy;
+    CombatLog combatLog;
+
 
     private void Awake()
     {
+        combatLog = GetComponent<CombatLog>();
         commandMenu = GetComponent<CommandMenu>();
         if (Instance != null && Instance != this)
         {
@@ -42,10 +56,21 @@ public class TurnManager : MonoBehaviour
         Instance = this;
     }
 
+    private void OnEnable()
+    {
+        Character.OnCharacterDeath += OnCharacterDied;
+    }
+
+    private void OnDisable()
+    {
+        Character.OnCharacterDeath -= OnCharacterDied;
+    }
+
     void Start()
     {
         state = GameState.Setup;
         new WaitForSeconds(3f);
+        combatLog.LogBattleStart();
         StartCombat();
     }
 
@@ -89,8 +114,7 @@ public class TurnManager : MonoBehaviour
 
     void ProcessCurrentUnit()
     {
-        Debug.Log($"Round {combatRound} - {currentUnit.name}'s turn (Initiative {currentInitiativeIndex + 1}/{ActiveUnits.Count}), belonging to team {currentUnit.team}");
-        new WaitForSeconds(5f); // Simulate a delay for processing
+        combatLog.LogTurnStart(currentUnit.name);
 
         if (currentUnit.team == Team.Player)
         {
@@ -112,14 +136,36 @@ public class TurnManager : MonoBehaviour
         public static void Deregister(Character unit) => AllUnits.Remove(unit);
     }
 
+    private void OnCharacterDied(Character deadCharacter)
+    {
+        // Deregister from unit registry
+        UnitRegistry.Deregister(deadCharacter);
+
+        // Update team counts
+        if (deadCharacter.team == Team.Player)
+        {
+            PlayerTeam.Remove(deadCharacter);
+        }
+        else if (deadCharacter.team == Team.Enemy)
+        {
+            EnemyTeam.Remove(deadCharacter);
+        }
+
+        // Handle turn logic...
+        if (currentUnit == deadCharacter)
+        {
+            EndCurrentUnitTurn();
+        }
+
+        CheckForBattleEnd();
+    }
+
     void IncrementRounds()
     {
         combatRound++;
         currentInitiativeIndex = 0;
 
-        Debug.Log($"=== Starting Round {combatRound} ===");
-
-        ActiveUnits.RemoveAll(unit => !unit.IsAlive());
+        combatLog.LogRoundStart(combatRound);
 
         if (ActiveUnits.Count > 0)
         {
@@ -152,6 +198,64 @@ public class TurnManager : MonoBehaviour
         ai.HandleAITurn(currentUnit);
     }
 
+    public void CheckForBattleEnd()
+    {
+        // Check if either team has no active units left
+        if (PlayerTeam.Count == 0 || EnemyTeam.Count == 0)
+        {
+            state = GameState.CombatEnd;
+            combatLog.LogBattleEnd(PlayerTeam.Count > 0 ? "Player" : "Enemy");
+
+            EndCombat(PlayerTeam.Count > 0 ? "Player" : "Enemy");
+        }
+    }
+
+    private void EndCombat(string winner)
+    {
+        // Force end any current turn
+        ForceEndTurn();
+
+        // Calculate and show results
+        ShowResultScreen(winner);
+    }
+
+    private void ForceEndTurn()
+    {
+        var clear = FindAnyObjectByType<ClearUtility>();
+
+        StopAllCoroutines();
+
+        if(currentUnit != null)
+        {
+            currentUnit = null;
+        }
+
+        clear.FullClear();
+        combatLog.logPanel.SetActive(false);
+        commandMenu.ClosePanel();
+    }
+
+    private void ShowResultScreen(string winner)
+    {
+        
+        // Setup UI
+        resultScreen.SetActive(true);
+        resultTitle.text = winner == "Player" ? "VICTORY!" : "DEFEAT";
+
+        scoreText.text = $"Units remaining: {PlayerTeam.Count}";
+        rankText.text = $"Total Rounds: {combatRound}";
+
+        // Setup buttons
+        restartButton.onClick.RemoveAllListeners();
+        restartButton.onClick.AddListener(RestartBattle);
+
+        quitButton.onClick.RemoveAllListeners();
+        quitButton.onClick.AddListener(QuitToMenu);
+
+        // Optional: Play victory/defeat sound
+        // AudioManager.PlaySound(winner == "Player" ? victorySound : defeatSound);
+    }
+
     public void EndCurrentUnitTurn()
     {
         if (isEndingTurn) return;
@@ -163,6 +267,10 @@ public class TurnManager : MonoBehaviour
             commandMenu.ClosePanel();
             state = GameState.Awaiting;
             Debug.Log($"{currentUnit.name}'s turn ended");
+
+            ActiveUnits.RemoveAll(unit => !unit.IsAlive());
+
+            CheckForBattleEnd();
 
             currentInitiativeIndex++;
             if (currentInitiativeIndex >= ActiveUnits.Count)
@@ -178,5 +286,19 @@ public class TurnManager : MonoBehaviour
             }
         }
         );
+    }
+
+    private void QuitToMenu()
+    {
+        Application.Quit();
+    }
+
+    private void RestartBattle()
+    {
+        // Hide result screen
+        resultScreen.SetActive(false);
+
+        // Reload the current scene
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
