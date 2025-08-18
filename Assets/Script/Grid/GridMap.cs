@@ -4,19 +4,31 @@ using UnityEngine;
 
 public class GridMap : MonoBehaviour, IGridMap
 {
-    Node[,] grid; // 2D array to hold all grid nodes
+    [SerializeField] private GameObject shieldSpritePrefab; // Visual marker
+    [SerializeField] float cellSize = 1f; // Size of each cell
+
+    private Node[,] grid; // 2D array to hold all grid nodes
+    public LayerMask coverLayer; // Layer for cover props (walls, fences, etc.)
+    public LayerMask terrain; // Layer used to detect terrain
+    public Material halfCoverMaterial; // Material for half cover
+    public Material fullCoverMaterial; // Material for full cover
+
     public int width = 25; // Number of cells along the width
     public int length = 25; // Number of cells along the length
-    [SerializeField] float cellSize = 1f; // Size of each cell
-    [SerializeField] LayerMask obstacle; // Layer used to detect obstacles
-    [SerializeField] LayerMask terrain; // Layer used to detect terrain
-    [SerializeField] private LayerMask coverLayer; // Layer for cover props (walls, fences, etc.)
-    [SerializeField] private GameObject shieldSpritePrefab; // Visual marker
+    public float coverCheckDistance = 0.8f; // Distance to check for cover
+    public bool showCoverIndicators = true; // Whether to show cover indicators in the scene
+
 
     private void Awake()
     {
         GenerateGrid(); // Create the grid when the scene starts
-        PopulateCover(); // Populate cover information for each cell
+        
+    }
+
+    private void Start()
+    {
+        CalculateAllCover(); // Calculate cover for all walkable tiles
+        CreateCoverVisuals(); // Create visual indicators for cover
     }
 
     private void GenerateGrid()
@@ -27,40 +39,10 @@ public class GridMap : MonoBehaviour, IGridMap
         {
             for (int x = 0; x < length; x++)
             {
-                Node node = new Node();
+                Vector2Int pos = new Vector2Int(x, y);
+                Node node = new Node(pos);
                 grid[x, y] = node; // Create a new Node at each cell
 
-                if(y > 0)
-                {
-                    Node northNeighbour = grid[x, y - 1];
-                    NodeEdge edge = new NodeEdge
-                    {
-                        from = node,
-                        to = northNeighbour,
-                        coverType = CoverType.None,
-                        blocksMovement = false,
-                        blocksLineOfSight = false
-                    };
-
-                    node.edges[0] = edge; // North edge
-                    northNeighbour.edges[2] = edge; // South edge
-                }
-
-                if(x > 0)
-                {
-                    Node westNeighbour = grid[x - 1, y];
-                    NodeEdge edge = new NodeEdge
-                    {
-                        from = node,
-                        to = westNeighbour,
-                        coverType = CoverType.None,
-                        blocksMovement = false,
-                        blocksLineOfSight = false
-                    };
-
-                    node.edges[3] = edge; // West edge
-                    westNeighbour.edges[1] = edge; // East edge
-                }
             }
         }
 
@@ -108,56 +90,65 @@ public class GridMap : MonoBehaviour, IGridMap
             {
                 // Check if there's an obstacle at the node's world position
                 Vector3 worldPosition = GetWorldPosition(x, y);
-                bool passable = !Physics.CheckBox(worldPosition, Vector3.one / 2 * cellSize, Quaternion.identity, obstacle);
+                bool passable = !Physics.CheckBox(worldPosition, Vector3.one / 2 * cellSize, Quaternion.identity, coverLayer);
                 grid[x, y].passable = passable; // Mark node as passable or not
             }
         }
     }
 
-    private void PopulateCover()
+    void CalculateAllCover()
     {
-        //var props = FindObjectsByType<CoverProp>(FindObjectsSortMode.None);
-
-        //foreach(var prop in props)
-        //{
-        //    if(CheckBoundry(prop.nodeA) == false || CheckBoundry(prop.nodeB) == false)
-        //    {
-        //        Debug.LogWarning($"CoverProp {prop.name} is out of bounds: A({prop.nodeA}) B({prop.nodeB})");
-        //        continue;
-        //    }
-
-        //    Node a = grid[prop.nodeA.x, prop.nodeA.y];
-        //    Node b = grid[prop.nodeB.x, prop.nodeB.y];
-
-        //    Vector2Int delta = prop.nodeB - prop.nodeA;
-        //    int dirFromA = DirectionToIndex(delta);
-        //    int dirFromB = (dirFromA + 2) % 4; // Opposite direction
-
-        //    NodeEdge edge = a.edges[dirFromA];
-        //    if (edge == null) continue;
-
-        //    edge.coverType = prop.coverType; // Set cover type
-        //    edge.blocksLineOfSight = true;
-
-        //    Vector3 posA = GetWorldPosition(prop.nodeA.x, prop.nodeA.y);
-        //    Vector3 posB = GetWorldPosition(prop.nodeB.x, prop.nodeB.y);
-        //    Vector3 centre = (posA + posB) / 2;
-        //    Vector3 forward = (posB - posA).normalized;
-
-        //    Instantiate(shieldSpritePrefab, centre + Vector3.up * 1.5f, Quaternion.LookRotation(forward));
-        //}
-
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < length; y++)
+            {
+                if (grid[x, y].passable)
+                {
+                    CalculateCoverForTile(new Vector2Int(x, y));
+                }
+            }
+        }
     }
 
-
-    int DirectionToIndex(Vector2Int offset)
+    void CalculateCoverForTile(Vector2Int tilePos)
     {
-        if (offset == Vector2Int.up) return 0;    // North
-        if (offset == Vector2Int.right) return 1; // East
-        if (offset == Vector2Int.down) return 2;  // South
-        if (offset == Vector2Int.left) return 3;  // West
-        Debug.LogWarning("Invalid offset: " + offset);
-        return -1;
+        Vector3 worldPos = GetWorldPosition(tilePos.x, tilePos.y);
+
+        // Check each direction for cover
+        CheckCoverInDirection(tilePos, worldPos, Vector3.forward, CoverDirection.North);
+        CheckCoverInDirection(tilePos, worldPos, Vector3.back, CoverDirection.South);
+        CheckCoverInDirection(tilePos, worldPos, Vector3.right, CoverDirection.East);
+        CheckCoverInDirection(tilePos, worldPos, Vector3.left, CoverDirection.West);
+    }
+
+    void CheckCoverInDirection(Vector2Int tilePos, Vector3 worldPos, Vector3 direction, CoverDirection coverDir)
+    {
+        if(!CheckWalkable(tilePos))
+        {
+            // If the tile is not walkable, no cover can be checked
+            grid[tilePos.x, tilePos.y].coverData[coverDir] = CoverType.None;
+            return;
+        }
+
+        // Cast ray from tile center in the specified direction
+        Vector3 rayStart = worldPos + Vector3.up * 0.1f; // Slightly above ground
+        Vector3 rayEnd = rayStart + direction * coverCheckDistance;
+
+        // Check at multiple heights for full vs half cover
+        bool hasLowCover = Physics.Linecast(rayStart, rayEnd, coverLayer);
+        bool hasHighCover = Physics.Linecast(rayStart + Vector3.up * 1.5f, rayEnd + Vector3.up * 1.5f, coverLayer);
+
+        CoverType coverType = CoverType.None;
+        if (hasHighCover)
+        {
+            coverType = CoverType.Full;
+        }
+        else if (hasLowCover)
+        {
+            coverType = CoverType.Half;
+        }
+
+        grid[tilePos.x, tilePos.y].coverData[coverDir] = coverType;
     }
 
     public Vector2Int GetGridPosition(Vector3 worldPosition)
@@ -195,6 +186,125 @@ public class GridMap : MonoBehaviour, IGridMap
                     Gizmos.DrawCube(pos, Vector3.one / 4);
                 }
             }
+        }
+    }
+
+    void CreateCoverVisuals()
+    {
+        if (!showCoverIndicators) return;
+
+        GameObject coverParent = new GameObject("CoverVisuals");
+        coverParent.transform.SetParent(transform);
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < length; y++)
+            {
+                Vector2Int pos = new Vector2Int(x, y);
+                CreateCoverVisualsForTile(pos, coverParent.transform);
+            }
+        }
+    }
+
+    void CreateCoverVisualsForTile(Vector2Int tilePos, Transform parent)
+    {
+        Node tile = grid[tilePos.x, tilePos.y];
+        if (!tile.passable) return;
+
+        Vector3 worldPos = GetWorldPosition(tilePos.x, tilePos.y);
+
+        foreach (var coverData in tile.coverData)
+        {
+            if (coverData.Value == CoverType.None) continue;
+
+            GameObject coverIndicator = CreateCoverIndicator(coverData.Value, coverData.Key);
+            coverIndicator.transform.SetParent(parent);
+
+            // Position the indicator
+            Vector3 indicatorPos = worldPos + GetDirectionOffset(coverData.Key) * (cellSize * 0.4f);
+            indicatorPos.y = (coverData.Value == CoverType.Half) ? 0.5f : 1f;
+            coverIndicator.transform.position = indicatorPos;
+
+            // Rotate to face the correct direction
+            coverIndicator.transform.rotation = GetDirectionRotation(coverData.Key);
+        }
+    }
+
+    GameObject CreateCoverIndicator(CoverType coverType, CoverDirection direction)
+    {
+        GameObject indicator = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        indicator.name = $"Cover_{coverType}_{direction}";
+
+        // Make indicators always visible and bright
+        Renderer renderer = indicator.GetComponent<Renderer>();
+
+        // Scale based on cover type
+        if (coverType == CoverType.Half)
+        {
+            indicator.transform.localScale = new Vector3(0.1f, 0.5f, 0.8f);
+            if (halfCoverMaterial != null)
+            {
+                renderer.material = halfCoverMaterial;
+            }
+            else
+            {
+                // Default bright yellow for half cover
+                renderer.material.color = Color.yellow;
+                renderer.material.SetFloat("_Metallic", 0f);
+                renderer.material.SetFloat("_Smoothness", 0.5f);
+            }
+        }
+        else
+        {
+            indicator.transform.localScale = new Vector3(0.1f, 1f, 0.8f);
+            if (fullCoverMaterial != null)
+            {
+                renderer.material = fullCoverMaterial;
+            }
+            else
+            {
+                // Default bright red for full cover
+                renderer.material.color = Color.red;
+                renderer.material.SetFloat("_Metallic", 0f);
+                renderer.material.SetFloat("_Smoothness", 0.5f);
+            }
+        }
+
+        // Ensure indicators are always visible by making them emissive
+        if (halfCoverMaterial == null || fullCoverMaterial == null)
+        {
+            Material mat = renderer.material;
+            mat.EnableKeyword("_EMISSION");
+            mat.SetColor("_EmissionColor", renderer.material.color * 0.3f);
+        }
+
+        // Remove collider as this is just visual
+        DestroyImmediate(indicator.GetComponent<Collider>());
+
+        return indicator;
+    }
+
+    Vector3 GetDirectionOffset(CoverDirection direction)
+    {
+        switch (direction)
+        {
+            case CoverDirection.North: return Vector3.forward;
+            case CoverDirection.South: return Vector3.back;
+            case CoverDirection.East: return Vector3.right;
+            case CoverDirection.West: return Vector3.left;
+            default: return Vector3.zero;
+        }
+    }
+
+    Quaternion GetDirectionRotation(CoverDirection direction)
+    {
+        switch (direction)
+        {
+            case CoverDirection.North: return Quaternion.identity;
+            case CoverDirection.South: return Quaternion.Euler(0, 180, 0);
+            case CoverDirection.East: return Quaternion.Euler(0, 90, 0);
+            case CoverDirection.West: return Quaternion.Euler(0, -90, 0);
+            default: return Quaternion.identity;
         }
     }
 
