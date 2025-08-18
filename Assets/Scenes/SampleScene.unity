@@ -2734,6 +2734,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 479035142084851519, guid: 43b4dc609bc56f64a8239869c6bedfc8, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1015505647}
+    - target: {fileID: 479035142084851519, guid: 43b4dc609bc56f64a8239869c6bedfc8, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Deselect
+      objectReference: {fileID: 0}
     - target: {fileID: 1228727444343988461, guid: 43b4dc609bc56f64a8239869c6bedfc8, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -2770,6 +2778,14 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5510961858226074452, guid: 43b4dc609bc56f64a8239869c6bedfc8, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1015505647}
+    - target: {fileID: 5510961858226074452, guid: 43b4dc609bc56f64a8239869c6bedfc8, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: MoveCommandSelected
+      objectReference: {fileID: 0}
     - target: {fileID: 5940745254325032542, guid: 43b4dc609bc56f64a8239869c6bedfc8, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -2785,6 +2801,14 @@ PrefabInstance:
     - target: {fileID: 6254448484756576897, guid: 43b4dc609bc56f64a8239869c6bedfc8, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7284339437054671109, guid: 43b4dc609bc56f64a8239869c6bedfc8, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1015505647}
+    - target: {fileID: 7284339437054671109, guid: 43b4dc609bc56f64a8239869c6bedfc8, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: AttackCommandSelected
       objectReference: {fileID: 0}
     - target: {fileID: 7391387459778620344, guid: 43b4dc609bc56f64a8239869c6bedfc8, type: 3}
       propertyPath: m_SizeDelta.x
