@@ -1,5 +1,8 @@
 using System.Collections;
+using System.Collections.Generic;
+using Unity.VisualScripting.ReorderableList.Internal;
 using UnityEngine;
+using UnityEngine.UIElements;
 using static TurnManager;
 
 public enum Team
@@ -26,11 +29,16 @@ public class Character : MonoBehaviour
     private HealthBar healthBar;
     public static event System.Action<Character> OnCharacterDeath;
 
+    public Vector2Int CurrentTile { get; private set; }
+    public Dictionary<CoverDirection, CoverType> CurrentCover { get; private set; }
+
     void OnEnable() => UnitRegistry.Register(this);
     void OnDisable() => UnitRegistry.Deregister(this);
 
     public void Awake()
     {
+        var pos = transform.position;
+        UpdateTile(GridMap.Instance.GetGridPosition(pos));
         healthBar = GetComponentInChildren<HealthBar>();
         HP = maxHP; // Initialize HP to max at start
         healthBar.SetName(Name);
@@ -50,7 +58,6 @@ public class Character : MonoBehaviour
     {
         int roll = Random.Range(1, 21); // Simulate a d20 roll
         int total = roll + atkMod; // Add attack modifier
-        Debug.Log($"{Name} rolled {roll} + {atkMod} = {total} to hit");
         return total;
     }
 
@@ -88,4 +95,67 @@ public class Character : MonoBehaviour
         Destroy(gameObject);
     }
 
+    public void UpdateTile(Vector2Int tilePos)
+    {
+        CurrentTile = tilePos;
+        CurrentCover = GridMap.Instance.grid[tilePos.x, tilePos.y].coverData;
+    }
+
+    public bool IsInCover()
+    {
+        // quick check if any direction offers cover
+        foreach (var kv in CurrentCover)
+        {
+            if (kv.Value != CoverType.None) return true;
+        }
+        return false;
+    }
+
+    public bool HasCoverAgainst(Vector3 attackerPos)
+    {
+        
+        Vector3 dirToAttacker = (attackerPos - transform.position).normalized;
+        Debug.Log($"{Name} checking cover against attacker at {attackerPos}, direction: {dirToAttacker}");
+
+        // figure out which grid direction is most aligned
+        CoverDirection facing = GridHelper.GetDirectionFromVector(dirToAttacker);
+        Debug.Log($"{Name} facing direction: {facing}");
+
+        if (CurrentCover.TryGetValue(facing, out var cover))
+        {
+            Debug.Log($"{Name} has {cover} cover against attack from {attackerPos}");
+            return cover != CoverType.None;
+        }
+
+        Debug.Log($"{Name} has no cover against attack from {attackerPos}, AC remains {AC}");
+        return false;
+    }
+
+    public int GetEffectiveAC(Vector3 attackerPos)
+    {
+        int effectiveAC = AC;
+
+        if (HasCoverAgainst(attackerPos))
+        {
+            var coverDir = GridHelper.GetDirectionFromVector(attackerPos - transform.position);
+            var cover = CurrentCover[coverDir];
+
+            if (cover == CoverType.Half)
+            {
+                effectiveAC += 2; // standard D&D-ish bonus
+                Debug.Log($"{Name} has half cover against attack from {attackerPos}, increasing AC by 2");
+            }
+            else if (cover == CoverType.Full)
+            {
+                effectiveAC += 5; // full cover is much stronger
+                Debug.Log($"{Name} has full cover against attack from {attackerPos}, increasing AC by 5");
+            }
+            else
+            {
+                Debug.Log($"{Name} has no cover against attack from {attackerPos}, AC remains {AC}");
+            }
+        }
+
+        return effectiveAC;
+    }
 }

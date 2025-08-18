@@ -41,3 +41,15 @@ public class Node
     }
 }
 
+public static class GridHelper
+{
+    public static CoverDirection GetDirectionFromVector(Vector3 dir)
+    {
+        dir.y = 0;
+        if (Vector3.Dot(dir, Vector3.forward) > 0.7f) return CoverDirection.North;
+        if (Vector3.Dot(dir, Vector3.back) > 0.7f) return CoverDirection.South;
+        if (Vector3.Dot(dir, Vector3.right) > 0.7f) return CoverDirection.East;
+        return CoverDirection.West;
+    }
+}
+

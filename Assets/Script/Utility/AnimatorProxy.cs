@@ -28,7 +28,6 @@ public class AnimatorProxy
 
         // Get the current state hash
         int animHash = animator.GetCurrentAnimatorStateInfo(0).fullPathHash;
-        Debug.Log($"Waiting for animation {animHash} to stop.");
 
         // Wait until that state is no longer active
         while (animator.GetCurrentAnimatorStateInfo(0).fullPathHash == animHash)
@@ -36,7 +35,6 @@ public class AnimatorProxy
             yield return null;
         }
 
-        Debug.Log($"Animation {animHash} has stopped.");
         callback?.Invoke();
     }
 }

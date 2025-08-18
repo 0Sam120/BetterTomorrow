@@ -7,11 +7,13 @@ public class GridMap : MonoBehaviour, IGridMap
     [SerializeField] private GameObject shieldSpritePrefab; // Visual marker
     [SerializeField] float cellSize = 1f; // Size of each cell
 
-    private Node[,] grid; // 2D array to hold all grid nodes
+    [HideInInspector] public Node[,] grid; // 2D array to hold all grid nodes
     public LayerMask coverLayer; // Layer for cover props (walls, fences, etc.)
     public LayerMask terrain; // Layer used to detect terrain
     public Material halfCoverMaterial; // Material for half cover
     public Material fullCoverMaterial; // Material for full cover
+
+    public static GridMap Instance { get; private set; } // Singleton instance of GridMap
 
     public int width = 25; // Number of cells along the width
     public int length = 25; // Number of cells along the length
@@ -21,8 +23,17 @@ public class GridMap : MonoBehaviour, IGridMap
 
     private void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+            // Initialize your grid here if needed
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
         GenerateGrid(); // Create the grid when the scene starts
-        
     }
 
     private void Start()
@@ -90,7 +101,7 @@ public class GridMap : MonoBehaviour, IGridMap
             {
                 // Check if there's an obstacle at the node's world position
                 Vector3 worldPosition = GetWorldPosition(x, y);
-                bool passable = !Physics.CheckBox(worldPosition, Vector3.one / 2 * cellSize, Quaternion.identity, coverLayer);
+                bool passable = !Physics.CheckBox(worldPosition, Vector3.one * (cellSize * 0.3f) / 2, Quaternion.identity, coverLayer);
                 grid[x, y].passable = passable; // Mark node as passable or not
             }
         }
@@ -98,10 +109,16 @@ public class GridMap : MonoBehaviour, IGridMap
 
     void CalculateAllCover()
     {
-        for (int x = 0; x < width; x++)
+        for (int y = 0; y < width; y++)
         {
-            for (int y = 0; y < length; y++)
+            for (int x = 0; x < length; x++)
             {
+                if (y < 0 || x >= length || y < 0 || y >= width)
+                {
+                    Debug.LogError($"Grid out of range at ({x},{y}) with grid {length}x{width}");
+                    continue;
+                }
+
                 if (grid[x, y].passable)
                 {
                     CalculateCoverForTile(new Vector2Int(x, y));
@@ -196,9 +213,9 @@ public class GridMap : MonoBehaviour, IGridMap
         GameObject coverParent = new GameObject("CoverVisuals");
         coverParent.transform.SetParent(transform);
 
-        for (int x = 0; x < width; x++)
+        for (int y = 0; y < width; y++)
         {
-            for (int y = 0; y < length; y++)
+            for (int x = 0; x < length; x++)
             {
                 Vector2Int pos = new Vector2Int(x, y);
                 CreateCoverVisualsForTile(pos, coverParent.transform);
@@ -232,7 +249,7 @@ public class GridMap : MonoBehaviour, IGridMap
 
     GameObject CreateCoverIndicator(CoverType coverType, CoverDirection direction)
     {
-        GameObject indicator = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        GameObject indicator = GameObject.CreatePrimitive(PrimitiveType.Quad);
         indicator.name = $"Cover_{coverType}_{direction}";
 
         // Make indicators always visible and bright
@@ -241,7 +258,7 @@ public class GridMap : MonoBehaviour, IGridMap
         // Scale based on cover type
         if (coverType == CoverType.Half)
         {
-            indicator.transform.localScale = new Vector3(0.1f, 0.5f, 0.8f);
+            indicator.transform.localScale = new Vector3(1f, 1f, 0.8f);
             if (halfCoverMaterial != null)
             {
                 renderer.material = halfCoverMaterial;
@@ -256,7 +273,7 @@ public class GridMap : MonoBehaviour, IGridMap
         }
         else
         {
-            indicator.transform.localScale = new Vector3(0.1f, 1f, 0.8f);
+            indicator.transform.localScale = new Vector3(1f, 1f, 0.8f);
             if (fullCoverMaterial != null)
             {
                 renderer.material = fullCoverMaterial;
@@ -300,10 +317,10 @@ public class GridMap : MonoBehaviour, IGridMap
     {
         switch (direction)
         {
-            case CoverDirection.North: return Quaternion.identity;
-            case CoverDirection.South: return Quaternion.Euler(0, 180, 0);
+            case CoverDirection.North: return Quaternion.identity; ;
+            case CoverDirection.South: return Quaternion.identity;
             case CoverDirection.East: return Quaternion.Euler(0, 90, 0);
-            case CoverDirection.West: return Quaternion.Euler(0, -90, 0);
+            case CoverDirection.West: return Quaternion.Euler(0, 90, 0);
             default: return Quaternion.identity;
         }
     }

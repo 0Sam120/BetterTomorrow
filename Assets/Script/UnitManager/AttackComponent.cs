@@ -22,21 +22,24 @@ public class AttackComponent : MonoBehaviour
     // Called when this character attacks a target on the grid
     public void AttackPosition(GridObject targetGridObject, int total)
     {
-        Debug.Log("Target Found");
+        Character targetCharacter = targetGridObject.GetComponent<Character>();
 
         // Rotate this character to face the target
-        RotateCharacter(targetGridObject.transform.position);
-        if(total >= targetGridObject.GetComponent<Character>().AC)
+        RotateCharacter(targetCharacter.transform.position);
+
+        int effectiveAC = targetCharacter.GetEffectiveAC(transform.position);
+        Debug.Log($"{character.Name} attacks {targetCharacter.Name} with a total of {total} against AC {effectiveAC}");
+
+        if (total >= effectiveAC)
         {
-            // If the attack hits, deal damage to the target character
-            int damage = Random.Range(1, character.DMG) + character.DMGMod; // Get the damage value from this character
-            targetGridObject.GetComponent<Character>().TakeDamage(damage);
-            Debug.Log($"{character.Name} attacks {targetGridObject.GetComponent<Character>().Name} for {damage} damage!");
+            // If the attack hits, deal damage
+            int damage = Random.Range(1, character.DMG) + character.DMGMod;
+            targetCharacter.TakeDamage(damage);
+            Debug.Log($"{character.Name} attacks {targetCharacter.Name} for {damage} damage!");
         }
         else
         {
-            // If the attack misses, log a message
-            Debug.Log($"{character.Name} attacks {targetGridObject.GetComponent<Character>().Name} but misses!");
+            Debug.Log($"{character.Name} attacks {targetCharacter.Name} but misses!");
         }
 
         // Play the attack animation

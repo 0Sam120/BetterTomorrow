@@ -85,14 +85,12 @@ public class TurnManager : MonoBehaviour
     void ScanForActiveUnits()
     {
         ActiveUnits = UnitRegistry.AllUnits.Where(unit => unit.IsAlive()).ToList();
-        Debug.Log($"Found {ActiveUnits.Count} active units for combat");
     }
 
     void AssignUnitsToTeams()
     {
         PlayerTeam = ActiveUnits.Where(unit => unit.team == Team.Player).ToList();
         EnemyTeam = ActiveUnits.Where(unit => unit.team == Team.Enemy).ToList();
-        Debug.Log($"Player Team: {PlayerTeam.Count} units, Enemy Team: {EnemyTeam.Count} units");
     }
 
     void RollInitiative()
@@ -100,16 +98,9 @@ public class TurnManager : MonoBehaviour
         foreach(var unit in ActiveUnits)
         {
             unit.Initiative = Random.Range(1, 21) + unit.InitiativeMod; // Roll 1d20 + Initiative Modifier
-            Debug.Log($"{unit.Name} rolled initiative: {unit.Initiative}");
         }
 
         ActiveUnits = ActiveUnits.OrderByDescending(unit => unit.Initiative).ToList();
-
-        Debug.Log("Initiative Order:");
-        for(int i = 0; i < ActiveUnits.Count; i++)
-        {
-            Debug.Log($"{i + 1}. {ActiveUnits[i].Name} (Initiative: {ActiveUnits[i].Initiative})");
-        }
     }
 
     void ProcessCurrentUnit()
@@ -176,6 +167,7 @@ public class TurnManager : MonoBehaviour
 
     public void HandlePlayerTurn()
     {
+        currentUnit.UpdateTile(currentUnit.GetComponent<GridObject>().positionOnGrid);
         currentUnit.GetComponent<CharacterTurn>().GrantTurn();
         Debug.Log("Player's turn started");
     }
@@ -187,6 +179,7 @@ public class TurnManager : MonoBehaviour
             Debug.LogError("Current unit is null in HandleEnemyTurn");
             return;
         }
+        currentUnit.UpdateTile(currentUnit.GetComponent<GridObject>().positionOnGrid);
         var ai = currentUnit.GetComponent<AIManager>();
         if (ai == null)
         {

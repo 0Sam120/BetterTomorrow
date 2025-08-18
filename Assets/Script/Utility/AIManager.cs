@@ -179,7 +179,6 @@ public class AIManager : MonoBehaviour
         }
 
         characterTurn.SpendMomentum(2);
-        Debug.Log($"Spent momentum:  {characterTurn.Momentum} remaining");
         thisUnit.GetComponent<UnitMovement>().Move(path);
         proxy.WaitUntilAnimationStops(() =>
         {
@@ -197,13 +196,10 @@ public class AIManager : MonoBehaviour
         if (enemiesInRange.Count > 0 && CanIAct(thisUnit, 2))
         {
             characterTurn.SpendMomentum(2);
-            Debug.Log("Spent momentum" + characterTurn.Momentum);
             Character targetEnemy = enemiesInRange.OrderBy(ed => ed.distance).FirstOrDefault().enemy; // For simplicity, target the first enemy in range
-            Debug.Log("Attacking enemy: " + targetEnemy.name);
             // Add attack logic here, e.g., targetEnemy.TakeDamage(thisUnit.atkDamage);
             int total = thisUnit.RollToHit();
             thisUnit.GetComponent<AttackComponent>().AttackPosition(targetEnemy.GetComponent<GridObject>(), total);
-            Debug.Log(proxy == null ? "Proxy is NULL" : "Proxy is fine");
             proxy.WaitUntilAnimationStops(() =>
             {
                 currentState = AIState.Evaluate;
@@ -300,7 +296,6 @@ public class AIManager : MonoBehaviour
             {
                 Vector2Int unitPos = currentPos;
                 Vector2Int targetPos = otherUnit.GetComponent<GridObject>().positionOnGrid;
-                Debug.Log(Equals(otherUnit, thisUnit) ? "Same Unit" : "Enemy Unit Found: " + otherUnit.name + " at position: " + targetPos);
 
                 enemies.Add(otherUnit);
             }
