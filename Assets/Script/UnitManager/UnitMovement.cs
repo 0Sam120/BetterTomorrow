@@ -8,7 +8,7 @@ public class UnitMovement : MonoBehaviour
     GridObject m_GridObject; // Reference to this unit's grid object
     List<Vector3> pathWorldPosition; // List of world positions to move through
     AnimationControlller m_AnimationControlller; // Reference to the animation controller
-    public bool isMoving = false; // Is the unit currently moving?
+    private bool isMoving = false; // Is the unit currently moving?
 
     private void Awake()
     {

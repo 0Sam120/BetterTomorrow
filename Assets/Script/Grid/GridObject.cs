@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GridObject : MonoBehaviour
 {
-    public GridMap targetGrid; // Reference to the grid this object belongs to
+    [HideInInspector] public GridMap targetGrid;
     public Vector2Int positionOnGrid; // Position of this object on the grid
 
     private void Start()
@@ -14,6 +14,8 @@ public class GridObject : MonoBehaviour
 
     private void Init()
     {
+        targetGrid = GridMap.Instance; // Get the singleton instance of the grid map
+
         // Get the object's grid position based on its world position
         positionOnGrid = targetGrid.GetGridPosition(transform.position);
 

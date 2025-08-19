@@ -13,7 +13,7 @@ public class SelectCharacter : MonoBehaviour
         cursorData = GetComponent<CursorData>();
         menu = GetComponent<CommandMenu>();
         input = GetComponent<CommandInput>();
-        clearUtility = GetComponent<ClearUtility>();
+        clearUtility = ClearUtility.Instance;
     }
 
     // Currently selected character

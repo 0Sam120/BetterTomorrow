@@ -11,7 +11,7 @@ public class GridRenderer : MonoBehaviour
 
     private void Awake()
     {
-        grid = GetComponentInParent<GridMap>(); // Get the GridMap component attached to the same GameObject
+        grid = GridMap.Instance; // Get the singleton instance of GridMap
         highlightPointGO = new List<GameObject>(); // Initialize the list of move points
     }
 

@@ -2,20 +2,13 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoveUnit : MonoBehaviour
+public class MoveUnit
 {
-    [SerializeField] private GridMap grid; // Implements IGridMap
-    [SerializeField] private GridRenderer targetRenderer;
-
-    private Pathfinder pathfinder;
-
-    private void Awake()
-    {
-        pathfinder = new Pathfinder(grid); // No GetComponent nonsense — clean instantiation
-    }
 
     public void CheckWalkableTerrain(Character targetCharacter)
     {
+        var targetRenderer = CommandInput.Instance.GetMovePointRenderer();
+
         GridObject gridObject = targetCharacter.GetComponent<GridObject>();
         Vector2Int origin = gridObject.positionOnGrid;
         float maxCost = targetCharacter.MaxMoveSpeed;
@@ -35,6 +28,7 @@ public class MoveUnit : MonoBehaviour
 
     public List<Vector2Int> GetPath(Vector2Int from, Vector2Int to)
     {
+        var pathfinder = new Pathfinder(GridMap.Instance);
         // from = origin, to = target destination
         var path = pathfinder.FindPath(from, to);
 
@@ -46,6 +40,7 @@ public class MoveUnit : MonoBehaviour
     /// </summary>
     private List<Vector2Int> FloodFillWalkable(Vector2Int origin, PathfindingSettings settings)
     {
+        
         var openSet = new SortedSet<NodeRecord>(new NodeRecordComparer());
         var visited = new HashSet<Vector2Int>();
         var costSoFar = new Dictionary<Vector2Int, float>();
@@ -75,7 +70,7 @@ public class MoveUnit : MonoBehaviour
 
             foreach (var neighbor in GetNeighbors(current.position))
             {
-                if (!grid.CheckBoundry(neighbor) || !grid.CheckWalkable(neighbor))
+                if (!GridMap.Instance.CheckBoundry(neighbor) || !GridMap.Instance.CheckWalkable(neighbor))
                     continue;
 
                 if (settings?.AdditionalWalkabilityCheck?.Invoke(neighbor) == false)

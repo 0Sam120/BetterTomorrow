@@ -214,7 +214,7 @@ public class TurnManager : MonoBehaviour
 
     private void ForceEndTurn()
     {
-        var clear = FindAnyObjectByType<ClearUtility>();
+        var clear = ClearUtility.Instance;
 
         StopAllCoroutines();
 

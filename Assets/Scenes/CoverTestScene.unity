@@ -610,11 +610,21 @@ PrefabInstance:
       propertyPath: attackHighlight
       value: 
       objectReference: {fileID: 412397329}
+    - target: {fileID: 8416605443974723660, guid: 5f0044cc369ac1d4ab1c12a1ad566c41, type: 3}
+      propertyPath: movePointRenderer
+      value: 
+      objectReference: {fileID: 1072370248}
+    - target: {fileID: 8416605443974723660, guid: 5f0044cc369ac1d4ab1c12a1ad566c41, type: 3}
+      propertyPath: attackPointRenderer
+      value: 
+      objectReference: {fileID: 412397329}
     - target: {fileID: 8502764194678672663, guid: 5f0044cc369ac1d4ab1c12a1ad566c41, type: 3}
       propertyPath: targetGrid
       value: 
       objectReference: {fileID: 1592953794}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 846278945390215299, guid: 5f0044cc369ac1d4ab1c12a1ad566c41, type: 3}
+    - {fileID: 8270983368767674358, guid: 5f0044cc369ac1d4ab1c12a1ad566c41, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -1352,7 +1362,8 @@ PrefabInstance:
       propertyPath: targetRenderer
       value: 
       objectReference: {fileID: 1072370248}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6929001561348397954, guid: 2f70664f93454c144ac39b7695a6fbbe, type: 3}
     m_RemovedGameObjects:
     - {fileID: 4815965590443582375, guid: 2f70664f93454c144ac39b7695a6fbbe, type: 3}
     m_AddedGameObjects: []

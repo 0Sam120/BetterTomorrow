@@ -1,6 +1,8 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class ClearUtility : MonoBehaviour
+public class ClearUtility
 {
 
     // Reference to the grid renderer used for attack highlights
@@ -9,6 +11,23 @@ public class ClearUtility : MonoBehaviour
     // Reference to the grid renderer used for movement highlights
     [SerializeField] GridRenderer moveHighlight;
 
+    private static ClearUtility instance = null;
+    private static readonly object lockObj = new object();
+
+    public static ClearUtility Instance
+    {
+        get
+        {
+            lock (lockObj)
+            {
+                if (instance == null)
+                {
+                    instance = new ClearUtility();
+                }
+                return instance;
+            }
+        }
+    }
 
     // Hides the grid highlight for attack range
     public void ClearGridHighlightAttack()

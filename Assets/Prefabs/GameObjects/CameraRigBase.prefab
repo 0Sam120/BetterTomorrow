@@ -12,8 +12,6 @@ GameObject:
   - component: {fileID: 8082199755481139160}
   - component: {fileID: 7029709678065884677}
   - component: {fileID: 3946487928714342875}
-  - component: {fileID: 586684981864147926}
-  - component: {fileID: 6929001561348397954}
   m_Layer: 0
   m_Name: Camera
   m_TagString: Untagged
@@ -139,39 +137,6 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!114 &586684981864147926
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3793590627095429933}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 11398def7f222df499cd92ef343309ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  grid: {fileID: 0}
-  terrain:
-    serializedVersion: 2
-    m_Bits: 192
---- !u!114 &6929001561348397954
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3793590627095429933}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2022f8100d39e7f4395d4d9d9ed062cc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  grid: {fileID: 0}
-  terrain:
-    serializedVersion: 2
-    m_Bits: 128
-  targetCharacter: {fileID: 0}
 --- !u!1 &4815965590443582375
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class GridMap : MonoBehaviour, IGridMap
 {
-    [SerializeField] private GameObject shieldSpritePrefab; // Visual marker
-    [SerializeField] float cellSize = 1f; // Size of each cell
-
     [HideInInspector] public Node[,] grid; // 2D array to hold all grid nodes
+
+    private CoverLogic coverLogic; // Logic for calculating cover
+
     public LayerMask coverLayer; // Layer for cover props (walls, fences, etc.)
     public LayerMask terrain; // Layer used to detect terrain
     public Material halfCoverMaterial; // Material for half cover
@@ -18,11 +18,14 @@ public class GridMap : MonoBehaviour, IGridMap
     public int width = 25; // Number of cells along the width
     public int length = 25; // Number of cells along the length
     public float coverCheckDistance = 0.8f; // Distance to check for cover
+    public float cellSize = 1f; // Size of each cell
     public bool showCoverIndicators = true; // Whether to show cover indicators in the scene
 
 
     private void Awake()
     {
+        coverLogic = new CoverLogic();
+
         if (Instance == null)
         {
             Instance = this;
@@ -38,7 +41,7 @@ public class GridMap : MonoBehaviour, IGridMap
 
     private void Start()
     {
-        CalculateAllCover(); // Calculate cover for all walkable tiles
+        coverLogic.CalculateAllCover(); // Calculate cover for all walkable tiles
         CreateCoverVisuals(); // Create visual indicators for cover
     }
 
@@ -107,67 +110,6 @@ public class GridMap : MonoBehaviour, IGridMap
         }
     }
 
-    void CalculateAllCover()
-    {
-        for (int y = 0; y < width; y++)
-        {
-            for (int x = 0; x < length; x++)
-            {
-                if (y < 0 || x >= length || y < 0 || y >= width)
-                {
-                    Debug.LogError($"Grid out of range at ({x},{y}) with grid {length}x{width}");
-                    continue;
-                }
-
-                if (grid[x, y].passable)
-                {
-                    CalculateCoverForTile(new Vector2Int(x, y));
-                }
-            }
-        }
-    }
-
-    void CalculateCoverForTile(Vector2Int tilePos)
-    {
-        Vector3 worldPos = GetWorldPosition(tilePos.x, tilePos.y);
-
-        // Check each direction for cover
-        CheckCoverInDirection(tilePos, worldPos, Vector3.forward, CoverDirection.North);
-        CheckCoverInDirection(tilePos, worldPos, Vector3.back, CoverDirection.South);
-        CheckCoverInDirection(tilePos, worldPos, Vector3.right, CoverDirection.East);
-        CheckCoverInDirection(tilePos, worldPos, Vector3.left, CoverDirection.West);
-    }
-
-    void CheckCoverInDirection(Vector2Int tilePos, Vector3 worldPos, Vector3 direction, CoverDirection coverDir)
-    {
-        if(!CheckWalkable(tilePos))
-        {
-            // If the tile is not walkable, no cover can be checked
-            grid[tilePos.x, tilePos.y].coverData[coverDir] = CoverType.None;
-            return;
-        }
-
-        // Cast ray from tile center in the specified direction
-        Vector3 rayStart = worldPos + Vector3.up * 0.1f; // Slightly above ground
-        Vector3 rayEnd = rayStart + direction * coverCheckDistance;
-
-        // Check at multiple heights for full vs half cover
-        bool hasLowCover = Physics.Linecast(rayStart, rayEnd, coverLayer);
-        bool hasHighCover = Physics.Linecast(rayStart + Vector3.up * 1.5f, rayEnd + Vector3.up * 1.5f, coverLayer);
-
-        CoverType coverType = CoverType.None;
-        if (hasHighCover)
-        {
-            coverType = CoverType.Full;
-        }
-        else if (hasLowCover)
-        {
-            coverType = CoverType.Half;
-        }
-
-        grid[tilePos.x, tilePos.y].coverData[coverDir] = coverType;
-    }
-
     public Vector2Int GetGridPosition(Vector3 worldPosition)
     {
         // Convert a world position into a grid coordinate
@@ -206,7 +148,7 @@ public class GridMap : MonoBehaviour, IGridMap
         }
     }
 
-    void CreateCoverVisuals()
+    public void CreateCoverVisuals()
     {
         if (!showCoverIndicators) return;
 

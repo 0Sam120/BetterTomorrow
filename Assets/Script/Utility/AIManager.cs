@@ -30,11 +30,9 @@ public enum AIType
 
 public class AIManager : MonoBehaviour
 {
-    [SerializeField] GridMap targetGrid;
     private Coroutine coroutine;
     CharacterTurn characterTurn;
     Character thisUnit;
-    Pathfinder pathfinder;
     GridObject gridObj;
     AnimatorProxy proxy;
     Animator animator;
@@ -44,11 +42,6 @@ public class AIManager : MonoBehaviour
     int optimalRange;
     int maxRange;
     int minRange;
-
-    private void Awake()
-    {
-        pathfinder = new Pathfinder(targetGrid);
-    }
 
     public void UpdateAI()
     {
@@ -168,7 +161,9 @@ public class AIManager : MonoBehaviour
 
     private void MoveToPosition()
     {
-        var path = pathfinder.FindPath(currentPos, CalculateBestMovePosition());
+        var pathfinder = new Pathfinder(GridMap.Instance);
+
+        var path = pathfinder.FindPath(currentPos, CalculateBestMovePosition(pathfinder));
         bool canSpend = CanIAct(thisUnit, 2);
         bool pathIsValid = thisUnit.GetComponent<UnitMovement>().PathIsValid(path);
 
@@ -213,7 +208,7 @@ public class AIManager : MonoBehaviour
         }
     }
 
-    Vector2Int CalculateBestMovePosition()
+    Vector2Int CalculateBestMovePosition(Pathfinder pathfinder)
     {
         Vector2Int bestPos = currentPos;
         int bestScore = int.MinValue;
@@ -262,6 +257,8 @@ public class AIManager : MonoBehaviour
 
     List<Vector2Int> GetWalkableTilesInRange(Character unit, int moveRange)
     {
+        var targetGrid = GridMap.Instance;
+
         Vector2Int startPos = unit.GetComponent<GridObject>().positionOnGrid;
         List<Vector2Int> walkableTiles = new List<Vector2Int>();
 

@@ -6,9 +6,6 @@ public class CursorData : MonoBehaviour
     // Reference to the main camera
     [SerializeField] Camera mainCamera;
 
-    // Reference to the grid map
-    [SerializeField] GridMap targetGrid;
-
     // Layer mask for terrain detection
     [SerializeField] LayerMask terrainMask;
 
@@ -25,7 +22,7 @@ public class CursorData : MonoBehaviour
         if (Physics.Raycast(ray, out hit, float.MaxValue, terrainMask))
         {
             // Convert world position to grid position
-            Vector2Int hitPosition = targetGrid.GetGridPosition(hit.point);
+            Vector2Int hitPosition = GridMap.Instance.GetGridPosition(hit.point);
 
             // Update position if it has changed
             if (hitPosition != positionOnGrid)

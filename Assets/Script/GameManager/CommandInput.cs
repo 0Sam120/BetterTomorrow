@@ -7,9 +7,12 @@ using UnityEngine.InputSystem;
 
 public class CommandInput : MonoBehaviour
 {
+    [SerializeField] CommandType currentCommand;
+    [SerializeField] GridRenderer movePointRenderer;
+    [SerializeField] GridRenderer attackPointRenderer;
+
     // References to other components
     SelectCharacter selectedCharacter;
-    [SerializeField] CommandType currentCommand;
 
     CommandManager commandManager;
     CursorData cursorData;
@@ -17,17 +20,31 @@ public class CommandInput : MonoBehaviour
     CharacterAttack characterAttack;
     MouseInput mouseInput;
 
+    public static CommandInput Instance { get; private set; }
+    public GridRenderer GetMovePointRenderer() => movePointRenderer;
+    public GridRenderer GetAttackPointRenderer() => attackPointRenderer;
+
     private void Awake()
     {
+        if(Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
         currentCommand = CommandType.Default;
 
-        // Initialize input system
+        // Initialize scripts
         mouseInput = new MouseInput();
+        commandManager = new CommandManager();
+        moveUnit = new MoveUnit();
 
         // Get component references
-        commandManager = GetComponent<CommandManager>();
         cursorData = GetComponent<CursorData>();
-        moveUnit = GetComponent<MoveUnit>();
         characterAttack = GetComponent<CharacterAttack>();
         selectedCharacter = GetComponent<SelectCharacter>();
     }

@@ -10,13 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1432940453163145937}
   - component: {fileID: 7136509872505829628}
-  - component: {fileID: 846278945390215299}
-  - component: {fileID: 4326329583323183728}
   - component: {fileID: 8416605443974723660}
-  - component: {fileID: 860853641470855335}
   - component: {fileID: 8502764194678672663}
   - component: {fileID: 5854218916723329638}
-  - component: {fileID: 8270983368767674358}
   - component: {fileID: 5006490804302113711}
   - component: {fileID: 6389012551849499092}
   m_Layer: 0
@@ -54,37 +50,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 0}
-  targetGrid: {fileID: 0}
   terrainMask:
     serializedVersion: 2
     m_Bits: 128
   positionOnGrid: {x: 0, y: 0}
---- !u!114 &846278945390215299
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7336422917251771928}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 32cab2b71dc092942819323c4009229d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &4326329583323183728
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7336422917251771928}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2022f8100d39e7f4395d4d9d9ed062cc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  grid: {fileID: 0}
-  targetRenderer: {fileID: 0}
 --- !u!114 &8416605443974723660
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -98,20 +67,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentCommand: 1
---- !u!114 &860853641470855335
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7336422917251771928}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 37e799c9a840fd44ebedbefeebe86992, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetGrid: {fileID: 0}
-  highlight: {fileID: 0}
+  movePointRenderer: {fileID: 0}
+  attackPointRenderer: {fileID: 0}
 --- !u!114 &8502764194678672663
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -140,20 +97,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   panel: {fileID: 0}
---- !u!114 &8270983368767674358
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7336422917251771928}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8ac6a682e8b1b4d4e897676b80253b7f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  attackHighlight: {fileID: 0}
-  moveHighlight: {fileID: 0}
 --- !u!114 &5006490804302113711
 MonoBehaviour:
   m_ObjectHideFlags: 0
