@@ -23,12 +23,21 @@ public class CommandInput : MonoBehaviour
 
         // Initialize input system
         mouseInput = new MouseInput();
+<<<<<<< Updated upstream
+=======
+        commandManager = new CommandManager();
+        moveUnit = new MoveUnit();
+        characterAttack = new CharacterAttack();
+>>>>>>> Stashed changes
 
         // Get component references
         commandManager = GetComponent<CommandManager>();
         cursorData = GetComponent<CursorData>();
+<<<<<<< Updated upstream
         moveUnit = GetComponent<MoveUnit>();
         characterAttack = GetComponent<CharacterAttack>();
+=======
+>>>>>>> Stashed changes
         selectedCharacter = GetComponent<SelectCharacter>();
     }
 

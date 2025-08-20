@@ -86,7 +86,7 @@ public class SelectCharacter : MonoBehaviour
     // Selects the character currently hovered over
     public void Select()
     {
-        if (hoverOverCharacter == null) { return; }
+        if (hoverOverCharacter == null || hoverOverCharacter.GetComponent<CharacterTurn>().Momentum != 0) { return; }
 
         selected = hoverOverCharacter;
         UpdateMenu();

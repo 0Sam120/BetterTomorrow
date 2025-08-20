@@ -4,10 +4,10 @@ public class ClearUtility : MonoBehaviour
 {
 
     // Reference to the grid renderer used for attack highlights
-    [SerializeField] GridRenderer attackHighlight;
+    GridRenderer attackHighlight = CommandInput.Instance.GetAttackPointRenderer();
 
     // Reference to the grid renderer used for movement highlights
-    [SerializeField] GridRenderer moveHighlight;
+    GridRenderer moveHighlight = CommandInput.Instance.GetMovePointRenderer();
 
 
     // Hides the grid highlight for attack range

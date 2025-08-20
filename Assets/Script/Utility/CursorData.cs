@@ -3,6 +3,8 @@ using UnityEngine.EventSystems;
 
 public class CursorData : MonoBehaviour
 {
+    public static event System.Action<Vector2Int> OnCursorMoved;
+
     // Reference to the main camera
     [SerializeField] Camera mainCamera;
 
@@ -31,6 +33,7 @@ public class CursorData : MonoBehaviour
             if (hitPosition != positionOnGrid)
             {
                 positionOnGrid = hitPosition;
+                OnCursorMoved?.Invoke(positionOnGrid);
             }
         }
     }

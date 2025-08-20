@@ -60,7 +60,7 @@ public class CharacterAttack : MonoBehaviour
         }
 
         // Highlight all valid attack tiles
-        highlight.fieldHighlight(attackPosition);
+        highlight.FieldHighlight(attackPosition);
     }
 
     // Returns the grid object located at the given grid position
