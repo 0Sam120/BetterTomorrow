@@ -19,7 +19,7 @@ public class Character : MonoBehaviour
     public int HP;
     public int AC = 14;
     public int atkRange = 5;
-    private int atkMod = 4;
+    public int atkMod = 4;
     public int DMG = 8;
     public int DMGMod = 2; // Damage modifier
     public int InitiativeMod = 2;
@@ -135,25 +135,29 @@ public class Character : MonoBehaviour
     {
         int effectiveAC = AC;
 
-        if (HasCoverAgainst(attackerPos))
-        {
-            var coverDir = GridHelper.GetDirectionFromVector(attackerPos - transform.position);
-            var cover = CurrentCover[coverDir];
+        Vector3 dirToAttacker = (attackerPos - transform.position).normalized;
+        CoverDirection coverDir = GridHelper.GetDirectionFromVector(dirToAttacker);
 
+        if (CurrentCover.TryGetValue(coverDir, out var cover))
+        {
             if (cover == CoverType.Half)
             {
-                effectiveAC += 2; // standard D&D-ish bonus
+                effectiveAC += 2;
                 Debug.Log($"{Name} has half cover against attack from {attackerPos}, increasing AC by 2");
             }
             else if (cover == CoverType.Full)
             {
-                effectiveAC += 5; // full cover is much stronger
+                effectiveAC += 5;
                 Debug.Log($"{Name} has full cover against attack from {attackerPos}, increasing AC by 5");
             }
             else
             {
                 Debug.Log($"{Name} has no cover against attack from {attackerPos}, AC remains {AC}");
             }
+        }
+        else
+        {
+            Debug.Log($"{Name} has no cover against attack from {attackerPos}, AC remains {AC}");
         }
 
         return effectiveAC;

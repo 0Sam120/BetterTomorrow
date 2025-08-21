@@ -43,6 +43,7 @@ public class GridMap : MonoBehaviour, IGridMap
     {
         coverLogic.CalculateAllCover(); // Calculate cover for all walkable tiles
         CreateCoverVisuals(); // Create visual indicators for cover
+
     }
 
     private void GenerateGrid()
@@ -165,7 +166,7 @@ public class GridMap : MonoBehaviour, IGridMap
         }
     }
 
-    void CreateCoverVisualsForTile(Vector2Int tilePos, Transform parent)
+    public void CreateCoverVisualsForTile(Vector2Int tilePos, Transform parent)
     {
         Node tile = grid[tilePos.x, tilePos.y];
         if (!tile.passable) return;

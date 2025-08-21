@@ -19,6 +19,7 @@ public class CommandInput : MonoBehaviour
     MoveUnit moveUnit;
     CharacterAttack characterAttack;
     MouseInput mouseInput;
+    CameraHelper helper;
 
     public static CommandInput Instance { get; private set; }
     public GridRenderer GetMovePointRenderer() => movePointRenderer;
@@ -42,10 +43,10 @@ public class CommandInput : MonoBehaviour
         mouseInput = new MouseInput();
         commandManager = new CommandManager();
         moveUnit = new MoveUnit();
+        characterAttack = new CharacterAttack();
 
         // Get component references
         cursorData = GetComponent<CursorData>();
-        characterAttack = GetComponent<CharacterAttack>();
         selectedCharacter = GetComponent<SelectCharacter>();
     }
 
@@ -83,9 +84,9 @@ public class CommandInput : MonoBehaviour
                 HighlightWalkableTerrain();
                 break;
             case CommandType.Attack:
-                characterAttack.CalculateAttackArea(
+                characterAttack.CalculateAttackTargets(
                     selectedCharacter.selected.GetComponent<GridObject>().positionOnGrid,
-                    selectedCharacter.selected.atkRange);
+                    selectedCharacter.selected.atkRange, selectedCharacter.selected.GetComponent<CameraHelper>());
                 break;
         }
     }
@@ -100,9 +101,6 @@ public class CommandInput : MonoBehaviour
                 break;
             case CommandType.MoveTo:
                 MoveCommand();
-                break;
-            case CommandType.Attack:
-                AttackCommand();
                 break;
         }
     }
@@ -120,12 +118,17 @@ public class CommandInput : MonoBehaviour
     }
 
     // Processes the attack command
-    private void AttackCommand()
+    public void AttackCommand()
     {
-        GridObject gridObject = characterAttack.GetAttackTarget(cursorData.positionOnGrid);
+        GridObject gridObject = characterAttack.GetCurrentTarget();
         if (gridObject == null) { return; }
 
-        commandManager.AddAttackCommand(selectedCharacter.selected, cursorData.positionOnGrid, gridObject);
+        commandManager.AddAttackCommand(
+            selectedCharacter.selected,
+            gridObject.positionOnGrid, // still need the grid cell for pathfinding/anim
+            gridObject
+        );
+
         commandManager.ExecuteCommand();
         currentCommand = CommandType.Default; // Reset command after execution
     }

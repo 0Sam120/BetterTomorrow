@@ -6,10 +6,10 @@ public class ClearUtility
 {
 
     // Reference to the grid renderer used for attack highlights
-    [SerializeField] GridRenderer attackHighlight;
+    GridRenderer attackHighlight = CommandInput.Instance.GetAttackPointRenderer();
 
     // Reference to the grid renderer used for movement highlights
-    [SerializeField] GridRenderer moveHighlight;
+    GridRenderer moveHighlight = CommandInput.Instance.GetMovePointRenderer();
 
     private static ClearUtility instance = null;
     private static readonly object lockObj = new object();

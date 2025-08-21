@@ -106,6 +106,7 @@ public class TurnManager : MonoBehaviour
     void ProcessCurrentUnit()
     {
         combatLog.LogTurnStart(currentUnit.name);
+        TargetingUI.Instance.attackSystem = currentUnit.GetComponent<AttackComponent>();
 
         if (currentUnit.team == Team.Player)
         {

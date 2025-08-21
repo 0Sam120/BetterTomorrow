@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 8389695597694891577}
   - component: {fileID: 379471144661578149}
   - component: {fileID: 6415032606466757069}
+  - component: {fileID: 819397661588957612}
+  - component: {fileID: 5877263547168093211}
   - component: {fileID: 2698919778836774225}
-  - component: {fileID: 3055061537680081368}
   - component: {fileID: -2118035285197553157}
   - component: {fileID: 5539761312832657301}
   m_Layer: 8
@@ -56,6 +57,7 @@ MonoBehaviour:
   HP: 100
   AC: 14
   atkRange: 5
+  atkMod: 4
   DMG: 20
   DMGMod: 2
   InitiativeMod: 2
@@ -76,6 +78,60 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetGrid: {fileID: 0}
   positionOnGrid: {x: 0, y: 0}
+--- !u!114 &819397661588957612
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3766252343236792873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80e30e544e918a34ea26923caf1853dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5877263547168093211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3766252343236792873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed17f4ac93f95ff4aa86b56b11b5bf26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameCamera: {fileID: 0}
+  attachedUnit: {fileID: 0}
+  offset: {x: 0, y: 2, z: -5}
+  transitionDuration: 1
+  transitionCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  smoothTransitions: 1
+  showDebugGizmos: 0
 --- !u!114 &2698919778836774225
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -89,18 +145,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 10
---- !u!114 &3055061537680081368
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3766252343236792873}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 80e30e544e918a34ea26923caf1853dd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &-2118035285197553157
 MonoBehaviour:
   m_ObjectHideFlags: 0

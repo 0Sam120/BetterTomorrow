@@ -23,7 +23,7 @@ public class MoveUnit
         List<Vector2Int> reachableTiles = FloodFillWalkable(origin, settings);
 
         targetRenderer.Hide();
-        targetRenderer.fieldHighlight(reachableTiles);
+        targetRenderer.FieldHighlight(reachableTiles);
     }
 
     public List<Vector2Int> GetPath(Vector2Int from, Vector2Int to)

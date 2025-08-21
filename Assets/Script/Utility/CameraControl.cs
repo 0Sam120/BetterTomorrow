@@ -5,7 +5,7 @@ using UnityEngine.InputSystem.LowLevel;
 
 public class CameraControl : MonoBehaviour
 {
-    private CameraMovement cameraActions; // Input actions asset for the camera
+    [HideInInspector] public CameraMovement cameraActions; // Input actions asset for the camera
     private InputAction movement;         // Reference to the movement input action
 
     private Transform cameraTransform;    // Reference to the camera's transform
@@ -33,8 +33,21 @@ public class CameraControl : MonoBehaviour
     private Vector3 horizontalVelocity; // Smoothed horizontal movement
     private Vector3 lastPosition;       // Last frame's position (to calculate velocity)
 
+    public static CameraControl Instance { get; private set; }
+
     private void Awake()
     {
+        // Singleton pattern to ensure only one instance of CameraControl exists
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
         // Initialize input actions and find the camera transform
         cameraActions = new CameraMovement();
         cameraTransform = this.GetComponentInChildren<Camera>().transform;
@@ -59,6 +72,8 @@ public class CameraControl : MonoBehaviour
 
     private void OnDisable()
     {
+        Debug.Log("Disabling CameraControl");
+
         // Unsubscribe input action events
         cameraActions.Camera.RotateCamera.started -= RotateCamera;
         cameraActions.Camera.RotateCamera.canceled -= RotateCamera;

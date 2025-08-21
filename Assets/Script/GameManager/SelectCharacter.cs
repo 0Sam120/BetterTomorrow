@@ -7,6 +7,9 @@ public class SelectCharacter : MonoBehaviour
     CommandMenu menu;
     CommandInput input;
     ClearUtility clearUtility;
+    CharacterAttack characterAttack;
+    CameraHelper helper;
+    CommandManager manager;
 
     private void Awake()
     {
@@ -14,6 +17,8 @@ public class SelectCharacter : MonoBehaviour
         menu = GetComponent<CommandMenu>();
         input = GetComponent<CommandInput>();
         clearUtility = ClearUtility.Instance;
+        characterAttack = new CharacterAttack();
+        manager = new CommandManager();
     }
 
     // Currently selected character
@@ -89,6 +94,7 @@ public class SelectCharacter : MonoBehaviour
         if (hoverOverCharacter == null) { return; }
 
         selected = hoverOverCharacter;
+        helper = selected.GetComponent<CameraHelper>();
         UpdateMenu();
     }
 
@@ -99,5 +105,15 @@ public class SelectCharacter : MonoBehaviour
         clearUtility.FullClear();
         UpdateMenu();
         input.SetCommandType(CommandType.Default);
+    }
+
+    public void PerformAction()
+    {
+        manager.ExecuteCommand();
+    }
+
+    public void CancelAction()
+    {
+        characterAttack.CancelAttack(helper);
     }
 }

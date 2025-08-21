@@ -61,7 +61,8 @@ public class CommandManager
 
         ClearUtility.Instance.FullClear();
         int total = receiver.RollToHit();
-        receiver.GetComponent<AttackComponent>().AttackPosition(currentCommand.target, total);
+        var attackComponent = receiver.GetComponent<AttackComponent>();
+        attackComponent.AttackPosition(currentCommand.target, total);
         currentCommand = null;
     }
 

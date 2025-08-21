@@ -12,8 +12,6 @@ GameObject:
   - component: {fileID: 2369743923204965204}
   - component: {fileID: 6132518944775520129}
   - component: {fileID: 1820898358539787895}
-  - component: {fileID: 6189714920093563750}
-  - component: {fileID: 5864399528299994289}
   - component: {fileID: 3930674203078940000}
   - component: {fileID: 8622717140908392029}
   m_Layer: 0
@@ -91,31 +89,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 10
-  isMoving: 0
---- !u!114 &6189714920093563750
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5923555725748134761}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95709760d12809c42a2d784e3c5260b0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &5864399528299994289
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5923555725748134761}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 80e30e544e918a34ea26923caf1853dd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &3930674203078940000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -144,7 +117,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12a92081cbb479248a9d326c73248769, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetGrid: {fileID: 0}
 --- !u!1001 &894036489749704608
 PrefabInstance:
   m_ObjectHideFlags: 0
