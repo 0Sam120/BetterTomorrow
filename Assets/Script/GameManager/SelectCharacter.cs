@@ -6,7 +6,6 @@ public class SelectCharacter : MonoBehaviour
     CursorData cursorData;
     CommandMenu menu;
     CommandInput input;
-    ClearUtility clearUtility;
     CharacterAttack characterAttack;
     CameraHelper helper;
     CommandManager manager;
@@ -16,9 +15,8 @@ public class SelectCharacter : MonoBehaviour
         cursorData = GetComponent<CursorData>();
         menu = GetComponent<CommandMenu>();
         input = GetComponent<CommandInput>();
-        clearUtility = ClearUtility.Instance;
-        characterAttack = new CharacterAttack();
         manager = new CommandManager();
+        characterAttack = new CharacterAttack();
     }
 
     // Currently selected character
@@ -62,7 +60,6 @@ public class SelectCharacter : MonoBehaviour
     // Called when Move command is selected from menu
     public void MoveCommandSelected()
     {
-        clearUtility.ClearGridHighlightAttack();
         input.SetCommandType(CommandType.MoveTo);
         input.InitCommand();
     }
@@ -70,7 +67,6 @@ public class SelectCharacter : MonoBehaviour
     // Called when Attack command is selected from menu
     public void AttackCommandSelected()
     {
-        clearUtility.ClearGridHighlightMove();
         input.SetCommandType(CommandType.Attack);
         input.InitCommand();
     }
@@ -102,9 +98,9 @@ public class SelectCharacter : MonoBehaviour
     public void Deselect()
     {
         selected = null;
-        clearUtility.FullClear();
         UpdateMenu();
         input.SetCommandType(CommandType.Default);
+        ClearUtility.Instance.FullClear();
     }
 
     public void PerformAction()
@@ -114,6 +110,6 @@ public class SelectCharacter : MonoBehaviour
 
     public void CancelAction()
     {
-        characterAttack.CancelAttack(helper);
+        characterAttack.CancelAttack();
     }
 }

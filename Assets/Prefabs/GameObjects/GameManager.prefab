@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 8502764194678672663}
   - component: {fileID: 5854218916723329638}
   - component: {fileID: 5006490804302113711}
+  - component: {fileID: -7559145158533029781}
   - component: {fileID: 6389012551849499092}
   m_Layer: 0
   m_Name: GameManager
@@ -124,6 +125,49 @@ MonoBehaviour:
   state: 0
   combatRound: 0
   currentInitiativeIndex: 0
+--- !u!114 &-7559145158533029781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7336422917251771928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed17f4ac93f95ff4aa86b56b11b5bf26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameCamera: {fileID: 0}
+  cinematicCamera: {fileID: 0}
+  offset: {x: 0, y: 2, z: -5}
+  transitionDuration: 1
+  transitionCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  smoothTransitions: 1
+  showDebugGizmos: 0
+  attachedUnit: {fileID: 0}
 --- !u!114 &6389012551849499092
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class ClearUtility
 {
-
     // Reference to the grid renderer used for attack highlights
     GridRenderer attackHighlight = CommandInput.Instance.GetAttackPointRenderer();
 
@@ -33,12 +32,14 @@ public class ClearUtility
     public void ClearGridHighlightAttack()
     {
         attackHighlight.Hide();
+        Debug.Log("Attack highlight cleared.");
     }
 
     // Hides the grid highlight for movement range
     public void ClearGridHighlightMove()
     {
         moveHighlight.Hide();
+        Debug.Log("Move highlight cleared.");
     }
 
     // Fully clears all pathfinding and grid highlights (attack and move)
@@ -46,5 +47,6 @@ public class ClearUtility
     {
         ClearGridHighlightMove();
         ClearGridHighlightAttack();
+        Debug.Log("Full clear executed. All highlights cleared.");
     }
 }

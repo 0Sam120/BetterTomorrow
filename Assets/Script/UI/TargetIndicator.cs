@@ -3,14 +3,14 @@ using UnityEngine.UI;
 
 public class TargetIndicator : MonoBehaviour
 {
-    private GridObject target;
-    private CharacterAttack attack;
+    private GridObject _target;
+    private CharacterAttack _attack;
 
     public void Initialize(GridObject target, CharacterAttack attack)
     {
-        this.target = target;
-        this.attack = attack;
+        _target = target;
+        _attack = attack;
 
-        GetComponent<Button>().onClick.AddListener(() => attack.SelectTarget(target));
+        GetComponent<Button>().onClick.AddListener(() => _attack.SelectTarget(_target));
     }
 }

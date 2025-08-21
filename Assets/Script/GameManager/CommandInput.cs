@@ -120,17 +120,17 @@ public class CommandInput : MonoBehaviour
     // Processes the attack command
     public void AttackCommand()
     {
-        GridObject gridObject = characterAttack.GetCurrentTarget();
-        if (gridObject == null) { return; }
+        var gridObject = characterAttack.GetCurrentTarget();
+        if (gridObject == null) return;
 
         commandManager.AddAttackCommand(
             selectedCharacter.selected,
-            gridObject.positionOnGrid, // still need the grid cell for pathfinding/anim
+            gridObject.positionOnGrid,
             gridObject
         );
 
         commandManager.ExecuteCommand();
-        currentCommand = CommandType.Default; // Reset command after execution
+        currentCommand = CommandType.Default;
     }
 
     // Processes the move command

@@ -5,7 +5,6 @@ public class CameraHelper : MonoBehaviour
 {
     [SerializeField] private Camera gameCamera;
     [SerializeField] private Camera cinematicCamera;
-    [SerializeField] private Transform attachedUnit;
     [SerializeField] private Vector3 offset = new Vector3(0, 2, -5);
 
     [SerializeField] private float transitionDuration = 1f;
@@ -13,6 +12,10 @@ public class CameraHelper : MonoBehaviour
     [SerializeField] private bool smoothTransitions = true;
 
     [SerializeField] private bool showDebugGizmos = false;
+
+    public Transform attachedUnit;
+
+    public static CameraHelper Instance { get; private set; }
 
     // Store original camera state
     private struct CameraState
@@ -39,9 +42,15 @@ public class CameraHelper : MonoBehaviour
 
     private void Awake()
     {
-        // Auto-assign camera if not set
-        if (gameCamera == null)
-            gameCamera = Camera.main;
+        if(Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     public void SetCameraControl(bool enabled)
@@ -104,7 +113,7 @@ public class CameraHelper : MonoBehaviour
 
         lastCameraState = new CameraState(gameCamera.transform, gameCamera.fieldOfView);
 
-        Vector3 cameraPosition = targetWorldPosition + offset;
+        Vector3 cameraPosition = attachedUnit.transform.position + offset;
         Quaternion targetRotation = Quaternion.LookRotation((targetWorldPosition - cameraPosition).normalized);
 
         if (useSmoothing && smoothTransitions)
@@ -232,3 +241,4 @@ public class CameraHelper : MonoBehaviour
         }
     }
 }
+

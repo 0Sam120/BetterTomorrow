@@ -49,8 +49,8 @@ public class CharacterAttack
             currentTargetIndex = 0; // Reset target index
             TargetingUI.Instance.SpawnIndicators(validTargets, this);
             TargetingUI.Instance.ShowForTarget(validTargets[currentTargetIndex]);
-            helper.ToggleCinematicCamera();
-            helper.SetCameraForAttack(validTargets[currentTargetIndex], true);
+            CameraHelper.Instance.ToggleCinematicCamera();
+            CameraHelper.Instance.SetCameraForAttack(validTargets[currentTargetIndex], true);
         }
     }
 
@@ -85,17 +85,15 @@ public class CharacterAttack
         {
             currentTargetIndex = index;
             TargetingUI.Instance.ShowForTarget(validTargets[currentTargetIndex]);
-            helper.SetCameraForAttack(validTargets[currentTargetIndex], true);
+            CameraHelper.Instance.SetCameraForAttack(validTargets[currentTargetIndex], true);
         }
     }
 
-    public void CancelAttack(CameraHelper cameraHelper)
+    public void CancelAttack()
     {
-        helper = cameraHelper;
-
         TargetingUI.Instance.Hide();
-        helper.ResetCameraPosition(true);
-        helper.ToggleGameCamera();
+        CameraHelper.Instance.ResetCameraPosition(true);
+        CameraHelper.Instance.ToggleGameCamera();
     }
 
     // Returns the grid object located at the given grid position

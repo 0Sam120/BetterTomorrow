@@ -7,14 +7,12 @@ public class AttackComponent : MonoBehaviour
     // Reference to the character's animation controller
     AnimationControlller characterAnimator;
     Character character;
-    CameraHelper cameraHelper;
 
 
     private void Awake()
     {
         character = GetComponent<Character>();
         characterAnimator = GetComponentInChildren<AnimationControlller>();
-        cameraHelper = GetComponent<CameraHelper>();
     }
 
     // Called when this character attacks a target on the grid
@@ -42,6 +40,8 @@ public class AttackComponent : MonoBehaviour
 
         // Play the attack animation
         characterAnimator.Attack();
+
+        ReturnToStartPosition();
     }
 
     // Rotates the character to face towards a world position
@@ -98,8 +98,7 @@ public class AttackComponent : MonoBehaviour
     public void ReturnToStartPosition()
     {
         TargetingUI.Instance.Hide();
-        cameraHelper.ResetCameraPosition(true);
-        cameraHelper.ToggleGameCamera();
+        CameraHelper.Instance.ToggleGameCamera();
     }
 }
 

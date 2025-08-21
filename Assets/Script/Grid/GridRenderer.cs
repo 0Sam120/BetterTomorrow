@@ -11,6 +11,8 @@ public class GridRenderer : MonoBehaviour
 
     private List<Vector2Int> currentMovementArea = new List<Vector2Int>();
 
+    private bool isInitialized = false;
+
     private void OnEnable() => CursorData.OnCursorMoved += HighlightSelectedCell;
     private void OnDisable() => CursorData.OnCursorMoved -= HighlightSelectedCell;
 
@@ -24,6 +26,8 @@ public class GridRenderer : MonoBehaviour
 
     public void Hide()
     {
+        isInitialized = false;
+
         // Clear selected cell highlight
         ClearSelectedCell();
         
@@ -42,6 +46,8 @@ public class GridRenderer : MonoBehaviour
 
     private void HighlightSelectedCell(Vector2Int selectedCell)
     {
+        if (!isInitialized) return;
+        
         // Create cover parent if it doesn’t exist yet
         if (coverParent == null)
         {
@@ -62,7 +68,7 @@ public class GridRenderer : MonoBehaviour
         }
 
         // Only highlight if inside the current movement area
-        if (currentMovementArea != null && currentMovementArea.Contains(selectedCell))
+        if (currentMovementArea != null && currentMovementArea.Contains(selectedCell) && isInitialized)
         {
             var pos = GridMap.Instance.GetWorldPosition(selectedCell.x, selectedCell.y);
             pos.y += 0.05f; // Slightly above ground to avoid z-fighting
@@ -151,6 +157,7 @@ public class GridRenderer : MonoBehaviour
 
         lineRenderer.positionCount = outlinePoints.Count;
         lineRenderer.SetPositions(outlinePoints.ToArray());
+        isInitialized = true;
         SetMovementArea(cells);
     }
 

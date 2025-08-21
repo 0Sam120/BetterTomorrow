@@ -107,6 +107,7 @@ public class TurnManager : MonoBehaviour
     {
         combatLog.LogTurnStart(currentUnit.name);
         TargetingUI.Instance.attackSystem = currentUnit.GetComponent<AttackComponent>();
+        CameraHelper.Instance.attachedUnit = currentUnit.transform;
 
         if (currentUnit.team == Team.Player)
         {
