@@ -86,7 +86,8 @@ public class CommandInput : MonoBehaviour
             case CommandType.Attack:
                 characterAttack.CalculateAttackTargets(
                     selectedCharacter.selected.GetComponent<GridObject>().positionOnGrid,
-                    selectedCharacter.selected.atkRange, selectedCharacter.selected.GetComponent<CameraHelper>());
+                    selectedCharacter.selected.atkRange, selectedCharacter.selected.GetComponent<CameraHelper>(),
+                    selectedCharacter.selected.team);
                 break;
         }
     }

@@ -11,11 +11,13 @@ public class CharacterAttack
     private int currentTargetIndex = 0;
 
     // Calculates all grid positions within the character's attack range
-    public void CalculateAttackTargets(Vector2Int characterPos, int attackRange, CameraHelper cameraHelper)
+    public void CalculateAttackTargets(Vector2Int characterPos, int attackRange, CameraHelper cameraHelper, Team team)
     {
         Debug.Log("Start target search");
         
         var helper = cameraHelper;
+
+        var unitTeam = team;
 
         validTargets.Clear();
 
@@ -36,7 +38,7 @@ public class CharacterAttack
                 if (!GridMap.Instance.CheckBoundry(characterPos.x + x, characterPos.y + y)) continue;
 
                 GridObject gridObject = GridMap.Instance.GetPlacedObject(checkPos);
-                if(gridObject != null && IsValidTarget(gridObject) && IsTargetVisible(characterPos, checkPos)) 
+                if(gridObject != null && IsValidTarget(gridObject) && gridObject.GetComponent<Character>().team != unitTeam) 
                 {                     
                     Debug.Log($"Found target at {checkPos} for character at {characterPos}");
                     validTargets.Add(gridObject);

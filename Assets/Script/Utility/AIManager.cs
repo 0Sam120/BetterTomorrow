@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Animations;
 using static TurnManager;
+using static UnityEngine.GraphicsBuffer;
 
 
 public enum AIState
@@ -36,12 +37,17 @@ public class AIManager : MonoBehaviour
     GridObject gridObj;
     AnimatorProxy proxy;
     Animator animator;
+    CoverLogic coverLogic;
     Vector2Int currentPos;
     AIType currentType;
     AIState currentState;
     int optimalRange;
     int maxRange;
     int minRange;
+
+    private const int COVER_BONUS_SCORE = 15;
+    private const int OUT_OF_COVER_TARGET_BONUS = 10;
+    private const int LOW_HEALTH_COVER_MULTIPLIER = 2;
 
     public void UpdateAI()
     {
@@ -101,13 +107,33 @@ public class AIManager : MonoBehaviour
         if (!CanIAct(thisUnit, 1))
             return AIState.Idle;
 
-        if (thisUnit.HP < thisUnit.maxHP * 0.2 && CanIAct(thisUnit, 2))
+        var enemies = GetEnemiesWithDistance();
+        bool isLowHealth = thisUnit.HP < thisUnit.maxHP * 0.3f; // Slightly higher threshold
+        bool hasAnyCover = thisUnit.IsInCover();
+
+        // If low health and not in cover, prioritize seeking cover
+        if (isLowHealth && !hasAnyCover && CanIAct(thisUnit, 2))
         {
-            Debug.Log("Unit HP is low, seeking cover.");
+            Debug.Log($"{thisUnit.name} has low HP ({thisUnit.HP}/{thisUnit.maxHP}) and no cover, seeking cover.");
             return AIState.SeekingCover;
         }
 
-        var enemies = GetEnemiesWithDistance();
+        // If low health but in cover, be more defensive
+        if (isLowHealth && hasAnyCover && CanIAct(thisUnit, 2))
+        {
+            // Check if we can attack from cover without moving
+            var enemiesInRange = enemies.Where(ed => ed.distance <= thisUnit.atkRange).ToList();
+            if (enemiesInRange.Count > 0)
+            {
+                Debug.Log($"{thisUnit.name} is low HP but in cover, attacking from defensive position.");
+                return AIState.Attacking;
+            }
+            else
+            {
+                Debug.Log($"{thisUnit.name} is low HP in cover but no targets in range, staying put.");
+                return AIState.Idle;
+            }
+        }
 
         if (enemies.Count > 0)
         {
@@ -140,30 +166,123 @@ public class AIManager : MonoBehaviour
 
     private void SeekCover()
     {
-        IList list = GetEnemiesWithDistance();
-        for (int i = 0; i < list.Count; i++)
+        // Find the best cover position
+        Vector2Int bestCoverPos = FindBestCoverPosition();
+
+        if (bestCoverPos != currentPos)
         {
-            Character otherUnit = (Character)list[i];
-            if (otherUnit != thisUnit)
+            var pathfinder = new Pathfinder(GridMap.Instance);
+            var path = pathfinder.FindPath(currentPos, bestCoverPos);
+            bool canSpend = CanIAct(thisUnit, 2);
+            bool pathIsValid = thisUnit.GetComponent<UnitMovement>().PathIsValid(path);
+
+            if (pathIsValid && canSpend)
             {
-                Vector2Int unitPos = currentPos;
-                Vector2Int targetPos = otherUnit.GetComponent<GridObject>().positionOnGrid;
-                Debug.Log("Enemy Unit Found: " + otherUnit.name + " at position: " + targetPos);
-                if (IsInRange(unitPos, targetPos, otherUnit.atkRange))
+                characterTurn.SpendMomentum(2);
+                thisUnit.GetComponent<UnitMovement>().Move(path);
+                proxy.WaitUntilAnimationStops(() =>
                 {
-                    Debug.Log("In Range of Enemy: " + otherUnit.name);
-                    Debug.Log("Seeking cover from " + otherUnit.name);
-                    MoveToPosition();
-                }
+                    currentPos = thisUnit.GetComponent<GridObject>().positionOnGrid;
+                    currentState = AIState.Evaluate;
+                    StartCoroutine(DelayedUpdateAI());
+                });
+                return;
             }
         }
+
+        Debug.Log($"{thisUnit.name} couldn't find suitable cover or path blocked, ending turn.");
+        currentState = AIState.Idle;
+    }
+
+    private Vector2Int FindBestCoverPosition()
+    {
+        Vector2Int bestPos = currentPos;
+        int bestScore = int.MinValue;
+
+        List<Vector2Int> walkableTiles = GetWalkableTilesInRange(thisUnit, (int)thisUnit.MaxMoveSpeed);
+        var enemies = GetAllEnemiesOnMap();
+
+        foreach (Vector2Int tile in walkableTiles)
+        {
+            int coverScore = ScoreCoverPosition(tile, enemies);
+
+            if (coverScore > bestScore)
+            {
+                bestScore = coverScore;
+                bestPos = tile;
+            }
+        }
+
+        return bestPos;
+    }
+
+    private int ScoreCoverPosition(Vector2Int position, List<Character> enemies)
+    {
+        int score = 0;
+
+        // Use your cover calculation system to check cover at this position
+        Dictionary<CoverDirection, CoverType> potentialCover = GetCoverAtPosition(position);
+
+        foreach (Character enemy in enemies)
+        {
+            Vector3 enemyWorldPos = enemy.transform.position;
+            Vector3 tileWorldPos = GridMap.Instance.GetWorldPosition(position.x, position.y);
+
+            // Check if this position would provide cover against this enemy
+            Vector3 dirToEnemy = (enemyWorldPos - tileWorldPos).normalized;
+            CoverDirection coverDir = GridHelper.GetDirectionFromVector(dirToEnemy);
+
+            if (potentialCover.TryGetValue(coverDir, out var coverType) && coverType != CoverType.None)
+            {
+                int coverValue = coverType == CoverType.Full ? COVER_BONUS_SCORE * 2 : COVER_BONUS_SCORE;
+                score += coverValue;
+                Debug.Log($"Position {position} would provide {coverType} cover against {enemy.name}");
+            }
+        }
+
+        // Bonus for positions that aren't too far from enemies (we still want to be able to engage)
+        if (enemies.Count > 0)
+        {
+            var closestEnemy = enemies.OrderBy(e =>
+                ManhattanDistance(position, e.GetComponent<GridObject>().positionOnGrid)).First();
+            int distanceToClosest = ManhattanDistance(position, closestEnemy.GetComponent<GridObject>().positionOnGrid);
+
+            // Prefer positions within 2x our attack range but not too close
+            if (distanceToClosest <= thisUnit.atkRange * 2 && distanceToClosest > minRange)
+            {
+                score += 5;
+            }
+        }
+
+        return score;
+    }
+
+    private Dictionary<CoverDirection, CoverType> GetCoverAtPosition(Vector2Int position)
+    {
+        // Access pre-calculated cover data from the Node at this position
+        Node tile = GridMap.Instance.grid[position.x, position.y];
+
+        if (tile != null && tile.coverData != null)
+        {
+            return tile.coverData;
+        }
+
+        // Fallback if node doesn't exist or has no cover data
+        Debug.LogWarning($"No cover data found for position {position}");
+        return new Dictionary<CoverDirection, CoverType>
+        {
+            { CoverDirection.North, CoverType.None },
+            { CoverDirection.South, CoverType.None },
+            { CoverDirection.East, CoverType.None },
+            { CoverDirection.West, CoverType.None }
+        };
     }
 
     private void MoveToPosition()
     {
         var pathfinder = new Pathfinder(GridMap.Instance);
-
-        var path = pathfinder.FindPath(currentPos, CalculateBestMovePosition(pathfinder));
+        Vector2Int targetPos = CalculateBestMovePosition(pathfinder);
+        var path = pathfinder.FindPath(currentPos, targetPos);
         bool canSpend = CanIAct(thisUnit, 2);
         bool pathIsValid = thisUnit.GetComponent<UnitMovement>().PathIsValid(path);
 
@@ -190,9 +309,10 @@ public class AIManager : MonoBehaviour
         var enemiesInRange = enemies.Where(ed => ed.distance <= thisUnit.atkRange).ToList();
         if (enemiesInRange.Count > 0 && CanIAct(thisUnit, 2))
         {
+            // Choose the best target based on cover and other factors
+            Character targetEnemy = ChooseBestTarget(enemiesInRange);
+
             characterTurn.SpendMomentum(2);
-            Character targetEnemy = enemiesInRange.OrderBy(ed => ed.distance).FirstOrDefault().enemy; // For simplicity, target the first enemy in range
-            // Add attack logic here, e.g., targetEnemy.TakeDamage(thisUnit.atkDamage);
             int total = thisUnit.RollToHit();
             thisUnit.GetComponent<AttackComponent>().AttackPosition(targetEnemy.GetComponent<GridObject>(), total);
             proxy.WaitUntilAnimationStops(() =>
@@ -205,7 +325,55 @@ public class AIManager : MonoBehaviour
         else
         {
             Debug.Log("No enemies in range to attack.");
+            currentState = AIState.Evaluate;
         }
+    }
+
+    private Character ChooseBestTarget(List<(Character enemy, int distance)> enemiesInRange)
+    {
+        if (enemiesInRange.Count == 1)
+            return enemiesInRange[0].enemy;
+
+        Character bestTarget = null;
+        int bestScore = int.MinValue;
+
+        foreach (var enemyData in enemiesInRange)
+        {
+            Character enemy = enemyData.enemy;
+            int score = 0;
+
+            // Prefer targets that are NOT in cover
+            if (!enemy.HasCoverAgainst(thisUnit.transform.position))
+            {
+                score += OUT_OF_COVER_TARGET_BONUS;
+                Debug.Log($"{enemy.name} is not in cover, bonus applied");
+            }
+            else
+            {
+                Debug.Log($"{enemy.name} is in cover, no bonus");
+            }
+
+            // Prefer closer targets (slight preference)
+            score += (10 - enemyData.distance);
+
+            // Prefer targets with lower health (finishing them off)
+            float healthPercent = (float)enemy.HP / enemy.maxHP;
+            if (healthPercent < 0.3f)
+                score += 8; // High priority for low health enemies
+            else if (healthPercent < 0.6f)
+                score += 4; // Medium priority
+
+            // Random factor to add some unpredictability
+            score += UnityEngine.Random.Range(-3, 3);
+
+            if (score > bestScore)
+            {
+                bestScore = score;
+                bestTarget = enemy;
+            }
+        }
+
+        return bestTarget ?? enemiesInRange[0].enemy;
     }
 
     Vector2Int CalculateBestMovePosition(Pathfinder pathfinder)
@@ -214,28 +382,27 @@ public class AIManager : MonoBehaviour
         int bestScore = int.MinValue;
 
         List<Vector2Int> walkableTiles = GetWalkableTilesInRange(thisUnit, (int)thisUnit.MaxMoveSpeed);
-        List<PathNode> walkableNodes = new List<PathNode>();
         var enemies = GetEnemiesWithDistance();
         var inRange = enemies.Where(ed => ed.distance <= thisUnit.atkRange).ToList();
-        var closest = enemies.OrderBy(ed => ed.distance).FirstOrDefault().enemy;
 
         if (enemies.Count == 0)
-            return currentPos; // no enemies at all, shouldn't happen under normal conditions
+            return currentPos;
 
         Character targetEnemy = null;
-
         if (inRange.Count > 0)
         {
-            targetEnemy = inRange.OrderBy(ed => ed.distance).FirstOrDefault().enemy;
+            // Choose best target from those in range
+            targetEnemy = ChooseBestTarget(inRange);
         }
         else
         {
-            targetEnemy = closest;
+            // Move towards the best potential target
+            var allEnemies = enemies.Select(ed => (ed.enemy, ed.distance)).ToList();
+            targetEnemy = ChooseBestTarget(allEnemies);
         }
 
         Vector2Int enemyPos = targetEnemy.GetComponent<GridObject>().positionOnGrid;
-        int distanceToEnemy = Mathf.Abs(currentPos.x - enemyPos.x) + Mathf.Abs(currentPos.y - enemyPos.y);
-
+        int distanceToEnemy = ManhattanDistance(currentPos, enemyPos);
         bool pursuitMode = distanceToEnemy > thisUnit.atkRange;
 
         foreach (Vector2Int tile in walkableTiles)
@@ -340,27 +507,58 @@ public class AIManager : MonoBehaviour
         int score = 0;
         int randomMod = UnityEngine.Random.Range(-5, 5);
         Vector2Int targetPos = targetUnit.GetComponent<GridObject>().positionOnGrid;
+        Vector3 tileWorldPos = GridMap.Instance.GetWorldPosition(tilePos.x,tilePos.y);
 
-        int distance = Mathf.Abs(tilePos.x - targetPos.x) + Mathf.Abs(tilePos.y - targetPos.y);
+        int distance = ManhattanDistance(tilePos, targetPos);
 
+        // Base distance scoring
         if (pursuitMode)
         {
-            // In pursuit, we want to *approach* the optimal range, not avoid it
-            // So we reverse the logic: lower distance → better score (but still aim for optimal)
             score -= Mathf.Abs(distance - optimalRange);
-
-            // Optional: encourage ending up near, but not *adjacent* to, the enemy
             if (distance < minRange)
-                score -= 5; // gentle nudge instead of a hard slap
+                score -= 5;
         }
         else
         {
             if (distance < minRange)
-                score -= 20; // nope, back off
+                score -= 20;
             else if (distance == optimalRange)
                 score += 10;
             else
                 score -= Mathf.Abs(distance - optimalRange);
+        }
+
+        // Cover considerations
+        var allEnemies = GetAllEnemiesOnMap();
+        int coverBonus = 0;
+
+        // Get potential cover at this tile
+        Dictionary<CoverDirection, CoverType> potentialCover = GetCoverAtPosition(tilePos);
+
+        foreach (Character enemy in allEnemies)
+        {
+            Vector3 enemyPos = enemy.transform.position;
+            Vector3 dirToEnemy = (enemyPos - tileWorldPos).normalized;
+            CoverDirection coverDir = GridHelper.GetDirectionFromVector(dirToEnemy);
+
+            if (potentialCover.TryGetValue(coverDir, out var coverType) && coverType != CoverType.None)
+            {
+                int coverValue = coverType == CoverType.Full ? COVER_BONUS_SCORE * 2 : COVER_BONUS_SCORE;
+                coverBonus += coverValue;
+            }
+        }
+
+        // Apply cover bonus, with multiplier for low health units
+        bool isLowHealth = thisUnit.HP < thisUnit.maxHP * 0.3f;
+        if (isLowHealth)
+            coverBonus *= LOW_HEALTH_COVER_MULTIPLIER;
+
+        score += coverBonus;
+
+        // Prefer positions that give us good shots at enemies without cover
+        if (distance <= thisUnit.atkRange && !targetUnit.HasCoverAgainst(tileWorldPos))
+        {
+            score += OUT_OF_COVER_TARGET_BONUS;
         }
 
         score += randomMod;

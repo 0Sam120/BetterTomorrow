@@ -54,6 +54,25 @@ public class TargetingUI : MonoBehaviour
 
     public void ShowForTarget(GridObject target)
     {
+        // Debug each component
+        if (hitChanceText == null)
+        {
+            Debug.LogError("hitChanceText is null! Make sure it's assigned in the inspector.");
+            return;
+        }
+
+        if (attackSystem == null)
+        {
+            Debug.LogError("attackSystem is null! Make sure it's assigned or initialized.");
+            return;
+        }
+
+        if (target == null)
+        {
+            Debug.LogError("target parameter is null!");
+            return;
+        }
+
         // Update texts
         hitChanceText.text = $"Hit Chance: {attackSystem.CalculateHitChance(target)}%";
         expectedDamageText.text = $"Expected Damage: {attackSystem.CalculateExpectedDamage()}";

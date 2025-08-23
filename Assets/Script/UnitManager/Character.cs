@@ -115,19 +115,19 @@ public class Character : MonoBehaviour
     {
         
         Vector3 dirToAttacker = (attackerPos - transform.position).normalized;
-        Debug.Log($"{Name} checking cover against attacker at {attackerPos}, direction: {dirToAttacker}");
+        //Debug.Log($"{Name} checking cover against attacker at {attackerPos}, direction: {dirToAttacker}");
 
         // figure out which grid direction is most aligned
         CoverDirection facing = GridHelper.GetDirectionFromVector(dirToAttacker);
-        Debug.Log($"{Name} facing direction: {facing}");
+        //Debug.Log($"{Name} facing direction: {facing}");
 
         if (CurrentCover.TryGetValue(facing, out var cover))
         {
-            Debug.Log($"{Name} has {cover} cover against attack from {attackerPos}");
+            //Debug.Log($"{Name} has {cover} cover against attack from {attackerPos}");
             return cover != CoverType.None;
         }
 
-        Debug.Log($"{Name} has no cover against attack from {attackerPos}, AC remains {AC}");
+        //Debug.Log($"{Name} has no cover against attack from {attackerPos}, AC remains {AC}");
         return false;
     }
 
