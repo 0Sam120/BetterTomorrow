@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af574fe9fd7d19049a31000d1eb27b52, type: 3}
+  m_Name: MoldEarth
+  m_EditorClassIdentifier: 
+  skillName: Mold Earth
+  icon: {fileID: 21300000, guid: ae491a240109ef94c9be1d14f3ec2ae4, type: 3}
+  description: Mold nearby terrain into usable cover
+  cooldown: 5
+  type: 2
+  duration: 5
+  range: 6
+  areaOfEffect: 0
+  cost: 5
+  targeting: 3
+  effectPower: 0
+  canCrit: 0
+  ignoreCover: 0
+  friendlyFire: 0
+  limitedCharges: 0
+  maxCharges: 0
+  requiresLOS: 0

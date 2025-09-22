@@ -163,6 +163,7 @@ public class TurnManager : MonoBehaviour
         if (ActiveUnits.Count > 0)
         {
             currentUnit = ActiveUnits[currentInitiativeIndex];
+            InitiativeTracker.Instance.UpdateInitiativeTracker(combatRound, ActiveUnits);
             ProcessCurrentUnit();
         }
     }
@@ -247,7 +248,7 @@ public class TurnManager : MonoBehaviour
         quitButton.onClick.RemoveAllListeners();
         quitButton.onClick.AddListener(QuitToMenu);
 
-        // Optional: Play victory/defeat sound
+        // TODO: Play victory/defeat sound
         // AudioManager.PlaySound(winner == "Player" ? victorySound : defeatSound);
     }
 
@@ -277,6 +278,7 @@ public class TurnManager : MonoBehaviour
             {
                 currentUnit = ActiveUnits[currentInitiativeIndex];
                 isEndingTurn = false;
+                InitiativeTracker.Instance.UpdateInitiativeTracker(combatRound, ActiveUnits);
                 ProcessCurrentUnit();
             }
         }

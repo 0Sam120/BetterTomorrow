@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class CharacterTurn : MonoBehaviour
 {
-    public TurnManager turnManager;
     public int Momentum; // Momentum for the character, used to track actions
     public int momentumGains;
     public int maxMomentumGained;

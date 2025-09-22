@@ -189,39 +189,60 @@ public class GridRenderer : MonoBehaviour
 
     private List<Vector3> ConnectEdgeSegments(List<Vector3> points)
     {
-        // Simple approach: remove duplicates and sort by position
-        // For a more robust solution, you'd want to properly connect the edge segments
-        HashSet<Vector3> uniquePoints = new HashSet<Vector3>();
-        foreach (var point in points)
+        // Build adjacency map: every point knows which points it's connected to
+        Dictionary<Vector3, List<Vector3>> adjacency = new Dictionary<Vector3, List<Vector3>>();
+        for (int i = 0; i < points.Count; i += 2)
         {
-            // Round to avoid floating point precision issues
-            Vector3 rounded = new Vector3(
-                Mathf.Round(point.x * 100f) / 100f,
-                point.y,
-                Mathf.Round(point.z * 100f) / 100f
-            );
-            uniquePoints.Add(rounded);
+            Vector3 a = points[i];
+            Vector3 b = points[i + 1];
+
+            if (!adjacency.ContainsKey(a)) adjacency[a] = new List<Vector3>();
+            if (!adjacency.ContainsKey(b)) adjacency[b] = new List<Vector3>();
+
+            adjacency[a].Add(b);
+            adjacency[b].Add(a);
         }
 
-        List<Vector3> result = new List<Vector3>(uniquePoints);
-
-        // Sort points to form outline (simplified approach)
-        if (result.Count > 2)
+        // Pick a starting point: lowest X, then lowest Z, just to be consistent
+        Vector3 start = points[0];
+        foreach (var p in adjacency.Keys)
         {
-            Vector3 centroid = Vector3.zero;
-            foreach (var point in result)
-                centroid += point;
-            centroid /= result.Count;
-
-            result.Sort((a, b) => {
-                float angleA = Mathf.Atan2(a.z - centroid.z, a.x - centroid.x);
-                float angleB = Mathf.Atan2(b.z - centroid.z, b.x - centroid.x);
-                return angleA.CompareTo(angleB);
-            });
+            if (p.x < start.x || (Mathf.Approximately(p.x, start.x) && p.z < start.z))
+                start = p;
         }
 
-        return result;
+        List<Vector3> ordered = new List<Vector3>();
+        HashSet<Vector3> visited = new HashSet<Vector3>();
+
+        Vector3 current = start;
+        Vector3 previous = Vector3.positiveInfinity; // something invalid
+
+        // Walk edges until we return to the start
+        do
+        {
+            ordered.Add(current);
+            visited.Add(current);
+
+            // pick the next neighbor that's not the one we just came from
+            Vector3 next = adjacency[current][0];
+            if (adjacency[current].Count > 1)
+            {
+                if (next == previous)
+                    next = adjacency[current][1];
+            }
+
+            previous = current;
+            current = next;
+
+        } while (current != start && !visited.Contains(current));
+
+        // close the loop
+        if (ordered.Count > 0 && ordered[0] != ordered[ordered.Count - 1])
+            ordered.Add(ordered[0]);
+
+        return ordered;
     }
+
 
     private struct EdgeSegment
     {

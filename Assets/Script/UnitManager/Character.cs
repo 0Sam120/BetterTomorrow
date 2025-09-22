@@ -14,9 +14,12 @@ public enum Team
 public class Character : MonoBehaviour
 {
     public string Name = "NaN";
+    public Sprite Portrait;
     public float MaxMoveSpeed = 5f;
     public int maxHP = 100;
     public int HP;
+    public int maxAP = 20;
+    public int AP;
     public int AC = 14;
     public int atkRange = 5;
     public int atkMod = 4;
@@ -41,6 +44,7 @@ public class Character : MonoBehaviour
         UpdateTile(GridMap.Instance.GetGridPosition(pos));
         healthBar = GetComponentInChildren<HealthBar>();
         HP = maxHP; // Initialize HP to max at start
+        AP = maxAP; // Initialize AP to max at start
         healthBar.SetName(Name);
         healthBar.UpdateHealthBar(HP, maxHP);
     }
@@ -72,6 +76,16 @@ public class Character : MonoBehaviour
         {
             healthBar.UpdateHealthBar(HP, maxHP);
         }
+    }
+
+    public void Heal(int amount)
+    {
+        HP += amount;
+        if (HP > maxHP)
+        {
+            HP = maxHP; // Cap HP at maxHP
+        }
+        healthBar.UpdateHealthBar(HP, maxHP);
     }
 
     private void Die()

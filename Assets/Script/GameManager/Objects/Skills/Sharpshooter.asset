@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af574fe9fd7d19049a31000d1eb27b52, type: 3}
+  m_Name: Sharpshooter
+  m_EditorClassIdentifier: 
+  skillName: Sharpshooter
+  icon: {fileID: 21300000, guid: f4f4aa5b9602c4d49a8216b25718c0cf, type: 3}
+  description: 'Ranged weapon attacks have a -5 penalty to their attack roll, but
+    deal an additional 10 damage. '
+  cooldown: 1
+  type: 0
+  duration: 1
+  range: 0
+  areaOfEffect: 0
+  cost: 1
+  targeting: 0
+  effectPower: 10
+  canCrit: 0
+  ignoreCover: 0
+  friendlyFire: 0
+  limitedCharges: 0
+  maxCharges: 0
+  requiresLOS: 0

@@ -108,7 +108,7 @@ public class AIManager : MonoBehaviour
             return AIState.Idle;
 
         var enemies = GetEnemiesWithDistance();
-        bool isLowHealth = thisUnit.HP < thisUnit.maxHP * 0.3f; // Slightly higher threshold
+        bool isLowHealth = thisUnit.HP < thisUnit.maxHP * 0.3f;
         bool hasAnyCover = thisUnit.IsInCover();
 
         // If low health and not in cover, prioritize seeking cover
@@ -121,7 +121,6 @@ public class AIManager : MonoBehaviour
         // If low health but in cover, be more defensive
         if (isLowHealth && hasAnyCover && CanIAct(thisUnit, 2))
         {
-            // Check if we can attack from cover without moving
             var enemiesInRange = enemies.Where(ed => ed.distance <= thisUnit.atkRange).ToList();
             if (enemiesInRange.Count > 0)
             {
@@ -130,7 +129,15 @@ public class AIManager : MonoBehaviour
             }
             else
             {
-                Debug.Log($"{thisUnit.name} is low HP in cover but no targets in range, staying put.");
+                // NEW: Even if no optimal targets, try repositioning for shots
+                var enemiesInExtendedRange = enemies.Where(ed => ed.distance <= thisUnit.atkRange + 2).ToList();
+                if (enemiesInExtendedRange.Count > 0)
+                {
+                    Debug.Log($"{thisUnit.name} is low HP in cover, repositioning for potential shots.");
+                    return AIState.Moving;
+                }
+
+                Debug.Log($"{thisUnit.name} is low HP in cover but no targets accessible, staying put.");
                 return AIState.Idle;
             }
         }
@@ -139,20 +146,33 @@ public class AIManager : MonoBehaviour
         {
             var nearest = enemies.OrderBy(ed => ed.distance).First().enemy.GetComponent<GridObject>().positionOnGrid;
 
+            // Check for immediate threats
             if (IsInRange(currentPos, nearest, minRange) && CanIAct(thisUnit, 2))
             {
-                Debug.Log("Enemy too close, disengaging.");
+                Debug.Log("Enemy too close, tactical repositioning.");
                 return AIState.Moving;
             }
 
+            // Primary attack check - optimal range
             if (IsInRange(currentPos, nearest, optimalRange) && CanIAct(thisUnit, 2))
             {
                 return AIState.Attacking;
             }
-            else
+
+            // NEW: Secondary attack check - any enemy in max range
+            var anyEnemyInMaxRange = enemies.Where(ed => ed.distance <= thisUnit.atkRange).ToList();
+            if (anyEnemyInMaxRange.Count > 0 && CanIAct(thisUnit, 2))
             {
-                return AIState.Moving;
+                // Check if it's worth taking a suboptimal shot
+                if (ShouldTakeSuboptimalShot(anyEnemyInMaxRange))
+                {
+                    Debug.Log($"{thisUnit.name} taking opportunistic shot at max range.");
+                    return AIState.Attacking;
+                }
             }
+
+            // Move to engage
+            return AIState.Moving;
         }
         else if (CanIAct(thisUnit, 2))
         {
@@ -161,6 +181,56 @@ public class AIManager : MonoBehaviour
         }
 
         return AIState.Idle;
+    }
+
+    // NEW: Helper method to determine if a suboptimal shot is worth taking
+    private bool ShouldTakeSuboptimalShot(List<(Character enemy, int distance)> enemiesInRange)
+    {
+        // Take the shot if:
+        // 1. Enemy is low on health (high chance to finish them)
+        // 2. Enemy is out of cover (better hit chance)
+        // 3. We're in good cover (safe to take the shot)
+        // 4. No better positioning is easily available
+
+        foreach (var enemyData in enemiesInRange)
+        {
+            Character enemy = enemyData.enemy;
+
+            // High priority: Enemy is very low health
+            if (enemy.HP < enemy.maxHP * 0.25f)
+            {
+                Debug.Log($"Taking shot at low-health {enemy.name}");
+                return true;
+            }
+
+            // Medium priority: Enemy is out of cover and we're in cover
+            if (!enemy.HasCoverAgainst(thisUnit.transform.position) && thisUnit.IsInCover())
+            {
+                Debug.Log($"Taking shot at exposed {enemy.name} from cover");
+                return true;
+            }
+
+            // Low priority: We have nothing better to do and enemy is moderately damaged
+            if (enemy.HP < enemy.maxHP * 0.6f)
+            {
+                // Check if we could easily get to a better position
+                var walkableTiles = GetWalkableTilesInRange(thisUnit, (int)thisUnit.MaxMoveSpeed);
+                bool betterPositionExists = walkableTiles.Any(tile =>
+                {
+                    int distanceToEnemy = ManhattanDistance(tile, enemy.GetComponent<GridObject>().positionOnGrid);
+                    return distanceToEnemy <= optimalRange &&
+                           GetCoverAtPosition(tile).Values.Any(cover => cover != CoverType.None);
+                });
+
+                if (!betterPositionExists)
+                {
+                    Debug.Log($"No better position available, taking available shot at {enemy.name}");
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
 
@@ -192,6 +262,7 @@ public class AIManager : MonoBehaviour
 
         Debug.Log($"{thisUnit.name} couldn't find suitable cover or path blocked, ending turn.");
         currentState = AIState.Idle;
+        StartCoroutine(DelayedUpdateAI());
     }
 
     private Vector2Int FindBestCoverPosition()
@@ -326,6 +397,7 @@ public class AIManager : MonoBehaviour
         {
             Debug.Log("No enemies in range to attack.");
             currentState = AIState.Evaluate;
+            StartCoroutine(DelayedUpdateAI());
         }
     }
 
@@ -342,29 +414,57 @@ public class AIManager : MonoBehaviour
             Character enemy = enemyData.enemy;
             int score = 0;
 
-            // Prefer targets that are NOT in cover
+            // HIGH PRIORITY: Finishing off low-health enemies
+            float healthPercent = (float)enemy.HP / enemy.maxHP;
+            if (healthPercent < 0.25f)
+                score += 20; // Very high priority for very low health
+            else if (healthPercent < 0.5f)
+                score += 12; // High priority for medium-low health
+            else if (healthPercent < 0.75f)
+                score += 6;  // Medium priority
+
+            // MEDIUM PRIORITY: Prefer targets that are NOT in cover
             if (!enemy.HasCoverAgainst(thisUnit.transform.position))
             {
                 score += OUT_OF_COVER_TARGET_BONUS;
                 Debug.Log($"{enemy.name} is not in cover, bonus applied");
             }
-            else
+
+            // RANGE OPTIMIZATION: Prefer enemies closer to optimal range
+            int distanceFromOptimal = Mathf.Abs(enemyData.distance - optimalRange);
+            score += (10 - distanceFromOptimal); // Better score for closer to optimal
+
+            // TACTICAL CONSIDERATIONS: 
+
+            // Prefer enemies that are isolated (can't get support)
+            var nearbyAllies = GetAllEnemiesOnMap().Where(e =>
+                e != enemy &&
+                ManhattanDistance(e.GetComponent<GridObject>().positionOnGrid,
+                                enemy.GetComponent<GridObject>().positionOnGrid) <= 3
+            ).Count();
+
+            if (nearbyAllies == 0)
+                score += 5; // Bonus for isolated targets
+
+            // Prefer enemies that pose a threat (are in range to hit us back)
+            if (enemyData.distance <= enemy.atkRange)
+                score += 3; // Slight bonus for neutralizing threats
+
+            // OPPORTUNITY COST: If this enemy is at max range but not optimal, 
+            // reduce score unless they're high-value targets
+            if (enemyData.distance > optimalRange)
             {
-                Debug.Log($"{enemy.name} is in cover, no bonus");
+                if (healthPercent > 0.5f && enemy.HasCoverAgainst(thisUnit.transform.position))
+                {
+                    score -= 8; // Penalty for suboptimal shots at healthy, covered enemies
+                    Debug.Log($"Reducing score for suboptimal shot at healthy, covered {enemy.name}");
+                }
             }
 
-            // Prefer closer targets (slight preference)
-            score += (10 - enemyData.distance);
+            // Small random factor to add unpredictability but not dominate decision
+            score += UnityEngine.Random.Range(-2, 2);
 
-            // Prefer targets with lower health (finishing them off)
-            float healthPercent = (float)enemy.HP / enemy.maxHP;
-            if (healthPercent < 0.3f)
-                score += 8; // High priority for low health enemies
-            else if (healthPercent < 0.6f)
-                score += 4; // Medium priority
-
-            // Random factor to add some unpredictability
-            score += UnityEngine.Random.Range(-3, 3);
+            Debug.Log($"Target scoring: {enemy.name} = {score} (HP: {healthPercent:P}, Distance: {enemyData.distance}, Cover: {enemy.HasCoverAgainst(thisUnit.transform.position)})");
 
             if (score > bestScore)
             {
@@ -505,34 +605,38 @@ public class AIManager : MonoBehaviour
     private int ScoreTile(Vector2Int tilePos, Character targetUnit, bool pursuitMode = false)
     {
         int score = 0;
-        int randomMod = UnityEngine.Random.Range(-5, 5);
+        int randomMod = UnityEngine.Random.Range(-3, 3); // Reduced randomness
         Vector2Int targetPos = targetUnit.GetComponent<GridObject>().positionOnGrid;
-        Vector3 tileWorldPos = GridMap.Instance.GetWorldPosition(tilePos.x,tilePos.y);
+        Vector3 tileWorldPos = GridMap.Instance.GetWorldPosition(tilePos.x, tilePos.y);
 
         int distance = ManhattanDistance(tilePos, targetPos);
+        bool isLowHealth = thisUnit.HP < thisUnit.maxHP * 0.2f;
 
-        // Base distance scoring
+        // More aggressive distance scoring
         if (pursuitMode)
         {
-            score -= Mathf.Abs(distance - optimalRange);
+            // Heavily favor getting closer to enemies
+            score += 20 - distance; // Big bonus for closer positions
+
+            if (distance <= thisUnit.atkRange)
+                score += 15; // Bonus for reaching attack range
+
             if (distance < minRange)
-                score -= 5;
+                score -= 10; // Reduced penalty (was -5)
         }
         else
         {
             if (distance < minRange)
-                score -= 20;
-            else if (distance == optimalRange)
-                score += 10;
+                score -= 15; // Reduced from -20
+            else if (distance <= thisUnit.atkRange)
+                score += 15; // Big bonus for staying in attack range
             else
-                score -= Mathf.Abs(distance - optimalRange);
+                score -= (distance - thisUnit.atkRange) * 3; // Penalty for being too far
         }
 
-        // Cover considerations
+        // Cover scoring - but don't let it dominate
         var allEnemies = GetAllEnemiesOnMap();
         int coverBonus = 0;
-
-        // Get potential cover at this tile
         Dictionary<CoverDirection, CoverType> potentialCover = GetCoverAtPosition(tilePos);
 
         foreach (Character enemy in allEnemies)
@@ -543,22 +647,42 @@ public class AIManager : MonoBehaviour
 
             if (potentialCover.TryGetValue(coverDir, out var coverType) && coverType != CoverType.None)
             {
-                int coverValue = coverType == CoverType.Full ? COVER_BONUS_SCORE * 2 : COVER_BONUS_SCORE;
+                int coverValue = coverType == CoverType.Full ? 8 : 5; // Reduced from 30/15
                 coverBonus += coverValue;
             }
         }
 
-        // Apply cover bonus, with multiplier for low health units
-        bool isLowHealth = thisUnit.HP < thisUnit.maxHP * 0.3f;
+        // Only multiply cover bonus for very low health units
         if (isLowHealth)
-            coverBonus *= LOW_HEALTH_COVER_MULTIPLIER;
+            coverBonus = Mathf.RoundToInt(coverBonus * 1.5f); // Reduced from 2x multiplier
 
         score += coverBonus;
 
-        // Prefer positions that give us good shots at enemies without cover
-        if (distance <= thisUnit.atkRange && !targetUnit.HasCoverAgainst(tileWorldPos))
+        // Aggressive bonus for positions that allow attacks on exposed enemies
+        if (distance <= thisUnit.atkRange)
         {
-            score += OUT_OF_COVER_TARGET_BONUS;
+            if (!targetUnit.HasCoverAgainst(tileWorldPos))
+            {
+                score += 12; // Increased from OUT_OF_COVER_TARGET_BONUS (10)
+            }
+
+            // Bonus for positions that can hit multiple enemies
+            var enemiesInAttackRange = allEnemies.Where(e =>
+                ManhattanDistance(tilePos, e.GetComponent<GridObject>().positionOnGrid) <= thisUnit.atkRange
+            ).Count();
+
+            if (enemiesInAttackRange > 1)
+                score += enemiesInAttackRange * 5; // Multi-target bonus
+        }
+
+        // Flanking bonus - prefer positions that get behind enemies
+        Vector2Int enemyToCurrentUnit = currentPos - targetPos;
+        Vector2Int enemyToNewPos = tilePos - targetPos;
+
+        // If we're moving to the opposite side of the enemy
+        if (enemyToCurrentUnit.x * enemyToNewPos.x < 0 || enemyToCurrentUnit.y * enemyToNewPos.y < 0)
+        {
+            score += 8; // Flanking bonus
         }
 
         score += randomMod;
@@ -567,7 +691,7 @@ public class AIManager : MonoBehaviour
 
     private IEnumerator DelayedUpdateAI()
     {
-        yield return new WaitForSeconds(UnityEngine.Random.Range(0.5f, 1.5f));
+        yield return new WaitForSeconds(UnityEngine.Random.Range(0.2f, 0.8f));
         UpdateAI();
     }
 
