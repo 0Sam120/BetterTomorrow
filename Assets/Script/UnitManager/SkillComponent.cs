@@ -29,22 +29,59 @@ public class SkillComponent : MonoBehaviour
     }
 
     // Check if a skill can currently be used
-    public bool CanUseSkill(SkillsScriptableObject skill)
+    private bool CanUseSkill(SkillsScriptableObject skill)
     {
         if (!skillStates.ContainsKey(skill)) return false;
 
         var data = skillStates[skill];
-        if (data.currentCooldown > 0) return false;
-        if (data.limitedCharges && data.chargesLeft <= 0) return false;
+        if (data.currentCooldown > 0) 
+        {
+            Debug.Log("Skill is on cooldown");
+            return false;
+        }
+        
+        if (data.limitedCharges && data.chargesLeft <= 0)
+        {
+            Debug.Log("Can't use a charge");
+            return false;
+        }
 
         // May also add resource checks here (AP/mana/etc.)
+        Debug.Log("You may now use your skill");
         return true;
     }
 
     // Use a skill (starts cooldown, reduces charges)
-    public void UseSkill(SkillsScriptableObject skill)
+    public void UseSkill(SkillsScriptableObject skill, List<Character> targets)
     {
         if (!CanUseSkill(skill)) return;
+        
+        switch (skill.rollType)
+        {
+            case RollType.None:
+                ApplyEffect(skill, targets);
+                break;
+            case RollType.Save:
+                foreach(var target in targets)
+                {
+                    if(target.MakeASave() >= GetComponent<Character>().save)
+                    {
+                        target.resistance = 0.5f;
+                        Debug.Log($"{target.name} succeeded on a save, and takes only half damage!");
+                    }
+                    else
+                        Debug.Log($"{target.name} failed its save and takes full damage.");
+                }
+                ApplyEffect(skill, targets);
+                foreach (var target in targets)
+                {
+                    if (target.MakeASave() >= GetComponent<Character>().save)
+                    {
+                        target.resistance = 1f;
+                    }
+                }
+                break;
+        }
 
         var data = skillStates[skill];
         data.currentCooldown = skill.cooldown;
@@ -53,6 +90,22 @@ public class SkillComponent : MonoBehaviour
 
         // Here’s where you’d hook in the actual effect application
         Debug.Log($"{gameObject.name} used {skill.skillName}!");
+    }
+
+    private void ApplyEffect(SkillsScriptableObject skill, List<Character> targets)
+    {
+        Debug.Log("Apllying effects");
+        
+        Character user = GetComponent<Character>();
+
+        foreach (var target in targets)
+        {
+            foreach (var effect in skill.effects)
+            {
+                effect.ApplyEffect(user, target, skill);
+                Debug.Log($"Applied {effect.name}");
+            }
+        }
     }
 
     // Helper struct to track runtime values

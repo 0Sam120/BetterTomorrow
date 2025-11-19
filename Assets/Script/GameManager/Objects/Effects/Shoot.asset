@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Shoot
   m_EditorClassIdentifier: 
   actionName: Shoot
-  icon: {fileID: 21300000, guid: f4f4aa5b9602c4d49a8216b25718c0cf, type: 3}
-  targetType: 2
+  icon: {fileID: 21300000, guid: e87f5557982b92847bc3b54cf3ff97cf, type: 3}
+  targetType: 3
   numAttacks: 1
   accuracyModifier: 0

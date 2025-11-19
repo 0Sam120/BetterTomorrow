@@ -7,16 +7,26 @@ public class SelectCharacter : MonoBehaviour
     CommandMenu menu;
     CommandInput input;
     CharacterAttack characterAttack;
-    CameraHelper helper;
     CommandManager manager;
+
+    public static SelectCharacter Instance { get; private set; }
 
     private void Awake()
     {
+        if(Instance != null && Instance != this)
+        {
+            Destroy(this);
+        }
+        else
+        {
+            Instance = this;
+        }
+
         cursorData = GetComponent<CursorData>();
         menu = GetComponent<CommandMenu>();
         input = GetComponent<CommandInput>();
         manager = new CommandManager();
-        characterAttack = new CharacterAttack();
+        characterAttack = GetComponent<CharacterAttack>();
     }
 
     // Currently selected character
@@ -71,27 +81,31 @@ public class SelectCharacter : MonoBehaviour
         input.InitCommand();
     }
 
+    public void AbilityCommandSelected(SkillsScriptableObject skill)
+    {
+        GetComponent<SkillResolution>().SkillTargeting(skill);
+        input.SetCommandType(CommandType.UseAbility);
+    }
+
     // Opens or closes the command menu based on selection state
     private void UpdateMenu()
     {
-        if (selected != null)
-        {
-            menu.OpenPanel();
-        }
-        else
-        {
-            menu.ClosePanel();
-        }
+        //if (selected != null)
+        //{
+        //    menu.OpenPanel();
+        //}
+        //else
+        //{
+        //    menu.ClosePanel();
+        //}
     }
 
     // Selects the character currently hovered over
-    public void Select()
+    public void Select(Character hoverOverCharacter)
     {
         if (hoverOverCharacter == null) { return; }
 
         selected = hoverOverCharacter;
-        helper = selected.GetComponent<CameraHelper>();
-        UpdateMenu();
     }
 
     // Deselects the current character and clears highlights
@@ -111,5 +125,6 @@ public class SelectCharacter : MonoBehaviour
     public void CancelAction()
     {
         characterAttack.CancelAttack();
+        CharacterMenu.instance.OpenMenu();
     }
 }

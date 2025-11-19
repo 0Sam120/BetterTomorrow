@@ -20,18 +20,28 @@ public class AttackComponent : MonoBehaviour
     {
         Character targetCharacter = targetGridObject.GetComponent<Character>();
 
+        var weapon = character.GetComponent<GearComponent>().weaponData;
+
         // Rotate this character to face the target
         RotateCharacter(targetCharacter.transform.position);
 
-        int effectiveAC = targetCharacter.GetEffectiveAC(character.transform.position);
+        int effectiveAC = targetCharacter.GetEffectiveAC(character.transform.position) - weapon.penetration;
         Debug.Log($"{character.Name} attacks {targetCharacter.Name} with a total of {total} against AC {effectiveAC}");
 
         if (total >= effectiveAC)
         {
             // If the attack hits, deal damage
-            int damage = Random.Range(1, character.DMG) + character.DMGMod;
-            targetCharacter.TakeDamage(damage);
-            Debug.Log($"{character.Name} attacks {targetCharacter.Name} for {damage} damage!");
+
+            int totalDamage = 0;
+
+            for (int i = 0; i == weapon.dieCount; i++)
+            {
+                int damage = Random.Range(1, weapon.damageDie) + character.DMGMod;
+                totalDamage += damage;
+            }
+
+            targetCharacter.TakeDamage(totalDamage);
+            Debug.Log($"{character.Name} attacks {targetCharacter.Name} for {totalDamage} damage!");
         }
         else
         {
@@ -82,7 +92,7 @@ public class AttackComponent : MonoBehaviour
     public string CalculateExpectedDamage()
     {
         int minDamage = 1 + character.DMGMod; // Minimum damage is 1 + modifier
-        int maxDamage = character.DMG + character.DMGMod; // Maximum damage is DMG + modifier
+        int maxDamage = character.GetComponent<GearComponent>().weaponData.damageDie + character.DMGMod; // Maximum damage is DMG + modifier
 
         string expectedDamage = $"{minDamage}-{maxDamage};";
 

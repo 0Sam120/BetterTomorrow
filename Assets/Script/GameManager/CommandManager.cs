@@ -7,7 +7,16 @@ public enum CommandType
 {
     Default,
     MoveTo,
-    Attack
+    Attack,
+    UseAbility
+}
+
+public class SkillCommandData
+{
+    public int Range;
+    public int Area;
+    public TargetType Target;
+    public List<SkillEffect> Effects;
 }
 
 // Represents a command to be executed by a character
@@ -16,8 +25,9 @@ public class Command
     public Character character;              // The character performing the command
     public Vector2Int selectedGrid;          // Target grid position for the command
     public CommandType type;                 // Type of command (Move or Attack)
+    public SkillCommandData skillData;
 
-    public Command(Character character, Vector2Int selectedGrid, CommandType type)
+    public Command(Character character, Vector2Int selectedGrid, CommandType type, SkillCommandData data = null)
     {
         this.character = character;
         this.selectedGrid = selectedGrid;
@@ -26,6 +36,7 @@ public class Command
 
     public List<Vector2Int> path;              // Path to follow (for MoveTo)
     public GridObject target;                // Target object (for Attack)
+    public List<Character> targetCharacters; // Target object (for Skill)
 }
 
 // Handles execution of move and attack commands
@@ -44,6 +55,9 @@ public class CommandManager
                 break;
             case CommandType.Attack:
                 ExecuteAttackCommand();
+                break;
+            case CommandType.UseAbility:
+                ExecuteAbilityCommand();
                 break;
         }
     }
@@ -89,6 +103,31 @@ public class CommandManager
         currentCommand = null;
     }
 
+    public void ExecuteAbilityCommand()
+    {
+        Debug.Log("Using ability");
+        
+        Character user = currentCommand.character;
+        var characterTurn = user.GetComponent<CharacterTurn>();
+
+        // Check both requirements BEFORE executing anything
+        bool canSpend = characterTurn.CanSpendMomentum(2);
+
+        if (!canSpend)
+        {
+            Debug.Log("Not enough momentum");
+            return; // Abort if either fails
+        }
+
+        // Now we can spend momentum and move
+        characterTurn.SpendMomentum(2);
+        ClearUtility.Instance.FullClear(); // Clear any previous highlights
+        user.GetComponent<SkillComponent>().UseSkill(TurnManager.Instance.currentSkill, currentCommand.targetCharacters);
+
+        TurnManager.Instance.currentSkill = null;
+        currentCommand = null;
+    }
+
     // Sets up a move command with path information
     public void AddMoveCommand(Character character, Vector2Int selectedGrid, List<Vector2Int> path)
     {
@@ -102,5 +141,23 @@ public class CommandManager
         currentCommand = new Command(attacker, selectGrid, CommandType.Attack);
         if (target == null) { return; }
         currentCommand.target = target;
+    }
+
+    public void AddAbilityCommand(Character user, Vector2Int selectGrid, List<Character> validTargets)
+    {
+        var skill = TurnManager.Instance.currentSkill;
+        
+        currentCommand = new Command(user, selectGrid, CommandType.UseAbility, new SkillCommandData
+        {
+            Range = skill.areaOfEffect,
+            Area = skill.range,
+            Target = skill.targeting
+
+        });
+
+        if(validTargets != null)
+        {
+            currentCommand.targetCharacters = validTargets;
+        }
     }
 }

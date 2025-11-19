@@ -15,16 +15,19 @@ public class Character : MonoBehaviour
 {
     public string Name = "NaN";
     public Sprite Portrait;
+    private int AC;
+
     public float MaxMoveSpeed = 5f;
+    public float resistance = 1f;
     public int maxHP = 100;
     public int HP;
     public int maxAP = 20;
     public int AP;
-    public int AC = 14;
+    
     public int atkRange = 5;
     public int atkMod = 4;
-    public int DMG = 8;
     public int DMGMod = 2; // Damage modifier
+    public int save = 14;
     public int InitiativeMod = 2;
     public int Initiative;
     public int damageTaken;
@@ -41,6 +44,7 @@ public class Character : MonoBehaviour
     public void Awake()
     {
         var pos = transform.position;
+        SetAC();
         UpdateTile(GridMap.Instance.GetGridPosition(pos));
         healthBar = GetComponentInChildren<HealthBar>();
         HP = maxHP; // Initialize HP to max at start
@@ -48,6 +52,43 @@ public class Character : MonoBehaviour
         healthBar.SetName(Name);
         healthBar.UpdateHealthBar(HP, maxHP);
     }
+
+    public void SetAC()
+    {
+        var armourType = ArmourType.Clothing;
+        var baseAC = 0;
+        var gear = GetComponent<GearComponent>();
+        if(gear.armourData == null)
+        {
+            armourType = ArmourType.Clothing;
+            baseAC = 10;
+        }
+        else
+        {
+            armourType = gear.armourData.armourType;
+            baseAC = gear.armourData.baseAC;
+        }
+
+        switch (armourType)
+        {
+            case ArmourType.Clothing:
+                AC = baseAC + DMGMod; // Clothing provides minimal protection
+            break;
+            case ArmourType.Light:
+                AC = baseAC + 2;
+            break;
+            case ArmourType.Medium:
+                AC = baseAC + 3;
+            break;
+            case ArmourType.Heavy:
+                AC = baseAC;
+            break;
+            default:
+                AC = 10 + DMGMod;
+            break;
+        }
+    }
+
     public bool IsAlive()
     {
         if (HP <= 0)
@@ -65,9 +106,16 @@ public class Character : MonoBehaviour
         return total;
     }
 
+    public int MakeASave()
+    {
+        int roll = Random.Range(1, 21);
+        int total = roll + atkMod;
+        return total;
+    }
+
     public void TakeDamage(int damage)
     {
-        HP -= damage;
+        HP -= (int)(damage * resistance);
         if (HP <= 0)
         {
             Die();

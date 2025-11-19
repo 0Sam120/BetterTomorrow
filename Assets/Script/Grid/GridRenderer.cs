@@ -5,16 +5,21 @@ using UnityEngine;
 public class GridRenderer : MonoBehaviour
 {
     [SerializeField] private GameObject highlightPrefab;
+    [SerializeField] private Transform highlightParent;
     private GameObject selectedCellHighlight;
     private GameObject coverParent;
     private LineRenderer lineRenderer;
 
     private List<Vector2Int> currentMovementArea = new List<Vector2Int>();
 
+    private int currentHighlightRadius = 2;
+    private int currentHighlightRange = 5;
     private bool isInitialized = false;
 
     private void OnEnable() => CursorData.OnCursorMoved += HighlightSelectedCell;
     private void OnDisable() => CursorData.OnCursorMoved -= HighlightSelectedCell;
+
+    public TargetType currentTargetType;
 
     private void Awake()
     {
@@ -22,6 +27,7 @@ public class GridRenderer : MonoBehaviour
         lineRenderer.positionCount = 0;
         lineRenderer.loop = true;
         lineRenderer.widthMultiplier = 0.05f;
+        currentTargetType = TargetType.Ally;
     }
 
     public void Hide()
@@ -29,8 +35,8 @@ public class GridRenderer : MonoBehaviour
         isInitialized = false;
 
         // Clear selected cell highlight
-        ClearSelectedCell();
-        
+        HighlightGenerator.Instance.ClearHighlights();
+
         // Clear outline
         lineRenderer.positionCount = 0;
     }
@@ -44,10 +50,16 @@ public class GridRenderer : MonoBehaviour
         DrawMovementOutline(cells);
     }
 
+    public void SetHighlightParameters(int radius, int range)
+    {
+        currentHighlightRadius = radius;
+        currentHighlightRange = range;
+    }
+
     private void HighlightSelectedCell(Vector2Int selectedCell)
     {
         if (!isInitialized) return;
-        
+
         // Create cover parent if it doesn’t exist yet
         if (coverParent == null)
         {
@@ -70,22 +82,41 @@ public class GridRenderer : MonoBehaviour
         // Only highlight if inside the current movement area
         if (currentMovementArea != null && currentMovementArea.Contains(selectedCell) && isInitialized)
         {
-            var pos = GridMap.Instance.GetWorldPosition(selectedCell.x, selectedCell.y);
-            pos.y += 0.05f; // Slightly above ground to avoid z-fighting
-            var rotation = Quaternion.Euler(90f, 0f, 0f);
-            selectedCellHighlight = Instantiate(highlightPrefab, pos, rotation, transform);
-
-            GridMap.Instance.CreateCoverVisualsForTile(selectedCell, coverParent.transform);
+            switch (currentTargetType)
+            {
+                case TargetType.Ally:
+                    HighlightGenerator.Instance.ShowHighlight(HighlightShape.Single, selectedCell, selectedCell, highlightPrefab, highlightParent);
+                    GridMap.Instance.CreateCoverVisualsForTile(selectedCell, coverParent.transform);
+                    break;
+                case TargetType.Area:
+                    HighlightGenerator.Instance.ShowHighlight(HighlightShape.Square, selectedCell, selectedCell, highlightPrefab, highlightParent, currentHighlightRadius, currentMovementArea);
+                    break;
+                case TargetType.Circle:
+                    HighlightGenerator.Instance.ShowHighlight(HighlightShape.Circle, selectedCell, selectedCell, highlightPrefab, highlightParent, currentHighlightRadius, currentMovementArea);
+                    break;
+                case TargetType.Line:
+                    HighlightGenerator.Instance.ShowHighlight(HighlightShape.Line, currentMovementArea[0], selectedCell, highlightPrefab, highlightParent, currentHighlightRange, currentMovementArea);
+                    break;
+                case TargetType.Cone:
+                    HighlightGenerator.Instance.ShowHighlight(HighlightShape.Cone, currentMovementArea[0], selectedCell, highlightPrefab, highlightParent, currentHighlightRange, currentMovementArea);
+                    break;
+                case TargetType.Self:
+                    HighlightGenerator.Instance.ClearHighlights();
+                    break;
+                case TargetType.None:
+                    HighlightGenerator.Instance.ClearHighlights();
+                    break;
+                default:
+                    HighlightGenerator.Instance.ClearHighlights();
+                    break;
+            }
         }
-    }
-
-    public void ClearSelectedCell()
-    {
-        if (selectedCellHighlight != null)
+        else
         {
-            Destroy(selectedCellHighlight);
-            selectedCellHighlight = null;
+            // Clear highlights when cursor is outside the movement area
+            HighlightGenerator.Instance.ClearHighlights();
         }
+
     }
 
     private void DrawMovementOutline(List<Vector2Int> cells)
@@ -241,6 +272,33 @@ public class GridRenderer : MonoBehaviour
             ordered.Add(ordered[0]);
 
         return ordered;
+    }
+
+    public List<Vector2Int> GetTargets()
+    {
+        List<Vector2Int> targets = new List<Vector2Int>();
+        GridMap map = GridMap.Instance;
+
+        if(TurnManager.Instance.currentSkill.targeting == TargetType.Self)
+        {
+            targets.Add(map.GetGridPosition(TurnManager.Instance.currentUnit.transform.position));
+        }
+        else
+        {
+            foreach (Transform t in highlightParent)
+            {
+                Vector3 pos = t.position;
+                if (map.CheckBoundry((int)pos.x, (int)pos.y))
+                {
+                    Vector2Int tile = map.GetGridPosition(pos);
+                    targets.Add(tile);
+                }
+            }
+        }
+
+        Debug.Log(targets.Count);
+
+        return targets;
     }
 
 

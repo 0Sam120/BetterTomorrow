@@ -20,6 +20,8 @@ MonoBehaviour:
   duration: 5
   range: 6
   areaOfEffect: 0
+  effects:
+  - {fileID: 11400000, guid: d1e742d72a6c186458cff5dc45f80346, type: 2}
   cost: 5
   targeting: 3
   effectPower: 0

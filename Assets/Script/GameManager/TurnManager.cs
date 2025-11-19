@@ -34,7 +34,7 @@ public class TurnManager : MonoBehaviour
     public static TurnManager Instance { get; private set; }
 
     public Character currentUnit;
-    public CommandMenu commandMenu;
+    public SkillsScriptableObject currentSkill = null;
     public AIManager AI;
     public GameState state;
     public int combatRound = 0;
@@ -47,7 +47,6 @@ public class TurnManager : MonoBehaviour
     private void Awake()
     {
         combatLog = GetComponent<CombatLog>();
-        commandMenu = GetComponent<CommandMenu>();
         if (Instance != null && Instance != this)
         {
             Destroy(this);
@@ -106,7 +105,9 @@ public class TurnManager : MonoBehaviour
     void ProcessCurrentUnit()
     {
         combatLog.LogTurnStart(currentUnit.name);
+
         TargetingUI.Instance.attackSystem = currentUnit.GetComponent<AttackComponent>();
+
         CameraHelper.Instance.attachedUnit = currentUnit.transform;
 
         if (currentUnit.team == Team.Player)
@@ -168,9 +169,18 @@ public class TurnManager : MonoBehaviour
         }
     }
 
+    public void ShowMovementOutline()
+    {
+        GetComponent<SelectCharacter>().MoveCommandSelected();
+    }
+
     public void HandlePlayerTurn()
     {
+        var selector = GetComponent<SelectCharacter>();
+        selector.Select(currentUnit);
+        ShowMovementOutline();
         currentUnit.UpdateTile(currentUnit.GetComponent<GridObject>().positionOnGrid);
+        CharacterMenu.instance.CharacterInfo();
         currentUnit.GetComponent<CharacterTurn>().GrantTurn();
         Debug.Log("Player's turn started");
     }
@@ -228,7 +238,6 @@ public class TurnManager : MonoBehaviour
 
         clear.FullClear();
         combatLog.logPanel.SetActive(false);
-        commandMenu.ClosePanel();
     }
 
     private void ShowResultScreen(string winner)
@@ -260,7 +269,6 @@ public class TurnManager : MonoBehaviour
         proxy = new AnimatorProxy(currentUnit.GetComponentInChildren<Animator>(), this);
         proxy.WaitUntilAnimationStops(() =>
         {
-            commandMenu.ClosePanel();
             state = GameState.Awaiting;
             Debug.Log($"{currentUnit.name}'s turn ended");
 

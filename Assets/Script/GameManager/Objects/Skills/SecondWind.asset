@@ -18,11 +18,14 @@ MonoBehaviour:
     hit points.
   cooldown: 0
   type: 1
+  rollType: 0
   duration: 0
   range: 0
   areaOfEffect: 0
+  effects:
+  - {fileID: 11400000, guid: 732043835d972b74bac38fd80e6db87e, type: 2}
   cost: 3
-  targeting: 0
+  targeting: 1
   effectPower: 10
   canCrit: 0
   ignoreCover: 0

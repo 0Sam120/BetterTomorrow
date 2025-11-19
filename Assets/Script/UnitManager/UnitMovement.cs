@@ -8,11 +8,13 @@ public class UnitMovement : MonoBehaviour
     GridObject m_GridObject; // Reference to this unit's grid object
     List<Vector3> pathWorldPosition; // List of world positions to move through
     AnimationControlller m_AnimationControlller; // Reference to the animation controller
+    Character m_Character; // Reference to the character component
     private bool isMoving = false; // Is the unit currently moving?
 
     private void Awake()
     {
         m_GridObject = GetComponent<GridObject>();
+        m_Character = GetComponent<Character>();
         m_AnimationControlller = GetComponentInChildren<AnimationControlller>();
     }
 
@@ -52,6 +54,10 @@ public class UnitMovement : MonoBehaviour
             if (pathWorldPosition.Count == 0)
             {
                 m_AnimationControlller.StopMoving(); // Stop move animation
+                if(m_Character == TurnManager.Instance.currentUnit && m_Character.team == Team.Player && GetComponent<CharacterTurn>().Momentum != 0)
+                {
+                    TurnManager.Instance.ShowMovementOutline();
+                }
                 isMoving = false; // Unit has stopped
             }
             else

@@ -8,8 +8,7 @@ using UnityEngine.InputSystem;
 public class CommandInput : MonoBehaviour
 {
     [SerializeField] CommandType currentCommand;
-    [SerializeField] GridRenderer movePointRenderer;
-    [SerializeField] GridRenderer attackPointRenderer;
+    [SerializeField] GridRenderer gridRenderer;
 
     // References to other components
     SelectCharacter selectedCharacter;
@@ -19,11 +18,9 @@ public class CommandInput : MonoBehaviour
     MoveUnit moveUnit;
     CharacterAttack characterAttack;
     MouseInput mouseInput;
-    CameraHelper helper;
 
     public static CommandInput Instance { get; private set; }
-    public GridRenderer GetMovePointRenderer() => movePointRenderer;
-    public GridRenderer GetAttackPointRenderer() => attackPointRenderer;
+    public GridRenderer GetRenderer() => gridRenderer;
 
     private void Awake()
     {
@@ -42,12 +39,12 @@ public class CommandInput : MonoBehaviour
         // Initialize scripts
         mouseInput = new MouseInput();
         commandManager = new CommandManager();
-        moveUnit = new MoveUnit();
-        characterAttack = new CharacterAttack();
 
         // Get component references
         cursorData = GetComponent<CursorData>();
         selectedCharacter = GetComponent<SelectCharacter>();
+        characterAttack = GetComponent<CharacterAttack>();
+        moveUnit = GetComponent<MoveUnit>();
     }
 
     private void OnEnable()
@@ -97,11 +94,8 @@ public class CommandInput : MonoBehaviour
     {
         switch (currentCommand)
         {
-            case CommandType.Default:
-                selectedCharacter.Select();
-                break;
-            case CommandType.MoveTo:
-                MoveCommand();
+            case CommandType.UseAbility:
+                AbilityCommand();
                 break;
         }
     }
@@ -109,13 +103,18 @@ public class CommandInput : MonoBehaviour
     // Handles right-click input
     private void HandleRightClick(InputAction.CallbackContext input)
     {
-        selectedCharacter.Deselect();
+        switch (currentCommand)
+        {
+            case CommandType.MoveTo:
+                MoveCommand();
+                break;
+        }
     }
 
     // Highlights tiles that are walkable for the selected character
     public void HighlightWalkableTerrain()
     {
-        moveUnit.CheckWalkableTerrain(selectedCharacter.selected);
+        moveUnit.CheckWalkableTerrain(selectedCharacter.selected, selectedCharacter.selected.GetComponent<Character>().MaxMoveSpeed);
     }
 
     // Processes the attack command
@@ -151,5 +150,15 @@ public class CommandInput : MonoBehaviour
         commandManager.AddMoveCommand(selectedCharacter.selected, cursorData.positionOnGrid, path);
         commandManager.ExecuteCommand();
         currentCommand = CommandType.Default; // Reset command after execution
+    }
+
+    private void AbilityCommand()
+    {
+        List<Character> validTargets;
+        validTargets = GetComponent<SkillResolution>().GetValidSkillTargets();
+
+        commandManager.AddAbilityCommand(selectedCharacter.selected, cursorData.positionOnGrid, validTargets);
+        commandManager.ExecuteCommand();
+        currentCommand = CommandType.Default;
     }
 }

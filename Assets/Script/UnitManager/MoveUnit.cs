@@ -2,16 +2,15 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoveUnit
+public class MoveUnit : MonoBehaviour
 {
-
-    public void CheckWalkableTerrain(Character targetCharacter)
+    public void CheckWalkableTerrain(Character targetCharacter, float cost)
     {
-        var targetRenderer = CommandInput.Instance.GetMovePointRenderer();
+        var targetRenderer = CommandInput.Instance.GetRenderer();
 
         GridObject gridObject = targetCharacter.GetComponent<GridObject>();
         Vector2Int origin = gridObject.positionOnGrid;
-        float maxCost = targetCharacter.MaxMoveSpeed;
+        float maxCost = cost;
 
         // Set up settings to simulate a range scan without a goal
         PathfindingSettings settings = new PathfindingSettings

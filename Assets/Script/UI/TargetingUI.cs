@@ -15,8 +15,6 @@ public class TargetingUI : MonoBehaviour
 
     [HideInInspector] public AttackComponent attackSystem;
 
-    private CharacterAttack _attack;
-
     public static TargetingUI Instance { get; private set; }
 
     private void Awake()
@@ -29,26 +27,6 @@ public class TargetingUI : MonoBehaviour
         else
         {
             Destroy(gameObject); // Ensure only one instance exists
-        }
-    }
-
-    public void Initialize(CharacterAttack attackSystem)
-    {
-        _attack = attackSystem;
-        gameObject.SetActive(true);
-    }
-
-    public void ShowForTargets(IReadOnlyList<GridObject> targets, CharacterAttack attack)
-    {
-        // clear previous
-        for (int i = indicatorsParent.childCount - 1; i >= 0; i--)
-            Destroy(indicatorsParent.GetChild(i).gameObject);
-
-        foreach (var t in targets)
-        {
-            var go = Instantiate(indicatorPrefab, indicatorsParent);
-            var indicator = go.GetComponent<TargetIndicator>();
-            indicator.Initialize(t, attack); // HUD button → SelectTarget(t)
         }
     }
 

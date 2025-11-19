@@ -18,11 +18,14 @@ MonoBehaviour:
     torching everything in the vicinity for 8d6 Fire damage.
   cooldown: 2
   type: 0
+  rollType: 2
   duration: 0
-  range: 30
-  areaOfEffect: 4
+  range: 10
+  areaOfEffect: 2
+  effects:
+  - {fileID: 11400000, guid: cf4dfbe3cc798774ea9fe1a18430b673, type: 2}
   cost: 5
-  targeting: 3
+  targeting: 5
   effectPower: 48
   canCrit: 0
   ignoreCover: 1

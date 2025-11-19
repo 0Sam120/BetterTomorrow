@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +8,8 @@ public class GridMap : MonoBehaviour, IGridMap
     [HideInInspector] public Node[,] grid; // 2D array to hold all grid nodes
 
     private CoverLogic coverLogic; // Logic for calculating cover
+
+    public List<LayerMask> obstacleLayers; // Layers considered as obstacles
 
     public LayerMask coverLayer; // Layer for cover props (walls, fences, etc.)
     public LayerMask terrain; // Layer used to detect terrain
@@ -103,9 +106,11 @@ public class GridMap : MonoBehaviour, IGridMap
         {
             for (int x = 0; x < length; x++)
             {
-                // Check if there's an obstacle at the node's world position
+
+                LayerMask combinedLayers = obstacleLayers.Aggregate((LayerMask)0, (current, layer) => current | layer);
+
                 Vector3 worldPosition = GetWorldPosition(x, y);
-                bool passable = !Physics.CheckBox(worldPosition, Vector3.one * (cellSize * 0.3f) / 2, Quaternion.identity, coverLayer);
+                bool passable = !Physics.CheckBox(worldPosition, Vector3.one * (cellSize * 0.3f) / 2, Quaternion.identity, combinedLayers);
                 grid[x, y].passable = passable; // Mark node as passable or not
             }
         }

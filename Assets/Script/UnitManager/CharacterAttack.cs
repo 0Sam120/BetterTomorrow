@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class CharacterAttack
+public class CharacterAttack : MonoBehaviour
 {
-    CameraHelper helper;
-
     private List<GridObject> validTargets = new List<GridObject>();
     private int currentTargetIndex = 0;
 
@@ -49,6 +47,7 @@ public class CharacterAttack
         if(validTargets.Count > 0)
         {
             currentTargetIndex = 0; // Reset target index
+            CharacterMenu.instance.Hide();
             TargetingUI.Instance.SpawnIndicators(validTargets, this);
             TargetingUI.Instance.ShowForTarget(validTargets[currentTargetIndex]);
             CameraHelper.Instance.ToggleCinematicCamera();

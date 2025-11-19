@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Spray
   m_EditorClassIdentifier: 
   actionName: Spray
-  icon: {fileID: 21300000, guid: 2610b9ee3ee02764a94f5faaec78350a, type: 3}
+  icon: {fileID: 21300000, guid: ff46654dae938184fa943478ed74c980, type: 3}
   targetType: 3
   numAttacks: 3
   accuracyModifier: -2

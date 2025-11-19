@@ -156,6 +156,7 @@ public class AIManager : MonoBehaviour
             // Primary attack check - optimal range
             if (IsInRange(currentPos, nearest, optimalRange) && CanIAct(thisUnit, 2))
             {
+                Debug.Log("Attacking Enemy");
                 return AIState.Attacking;
             }
 
