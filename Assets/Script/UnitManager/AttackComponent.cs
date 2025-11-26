@@ -31,16 +31,17 @@ public class AttackComponent : MonoBehaviour
         if (total >= effectiveAC)
         {
             // If the attack hits, deal damage
-
             int totalDamage = 0;
 
-            for (int i = 0; i == weapon.dieCount; i++)
+            for (int i = 0; i < weapon.dieCount; i++)
             {
                 int damage = Random.Range(1, weapon.damageDie) + character.DMGMod;
                 totalDamage += damage;
             }
 
-            targetCharacter.TakeDamage(totalDamage);
+            totalDamage = character.GetComponent<CharacterTurn>().CheckMomentum(totalDamage, weapon.damageType, character);
+
+            targetCharacter.TakeDamage(totalDamage, weapon.damageType);
             Debug.Log($"{character.Name} attacks {targetCharacter.Name} for {totalDamage} damage!");
         }
         else

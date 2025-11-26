@@ -93,8 +93,10 @@ public class CharacterAttack : MonoBehaviour
     public void CancelAttack()
     {
         TargetingUI.Instance.Hide();
+        SelectCharacter.Instance.MoveCommandSelected();
         CameraHelper.Instance.ResetCameraPosition(true);
         CameraHelper.Instance.ToggleGameCamera();
+        CharacterMenu.instance.OpenMenu();
     }
 
     // Returns the grid object located at the given grid position

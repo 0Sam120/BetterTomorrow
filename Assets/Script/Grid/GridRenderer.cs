@@ -282,6 +282,7 @@ public class GridRenderer : MonoBehaviour
         if(TurnManager.Instance.currentSkill.targeting == TargetType.Self)
         {
             targets.Add(map.GetGridPosition(TurnManager.Instance.currentUnit.transform.position));
+            Debug.Log($"Added self target at {targets[0]}");
         }
         else
         {

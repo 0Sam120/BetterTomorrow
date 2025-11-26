@@ -51,6 +51,9 @@ public class AIManager : MonoBehaviour
 
     public void UpdateAI()
     {
+
+        Debug.Log($"[UpdateAI] {thisUnit.name} - Current State: {currentState}");
+
         switch (currentState)
         {
             case AIState.Evaluate:
@@ -153,23 +156,12 @@ public class AIManager : MonoBehaviour
                 return AIState.Moving;
             }
 
-            // Primary attack check - optimal range
-            if (IsInRange(currentPos, nearest, optimalRange) && CanIAct(thisUnit, 2))
+            // Attack if ANY enemy is within attack range
+            var anyEnemyInAttackRange = enemies.Where(ed => ed.distance <= thisUnit.atkRange).ToList();
+            if (anyEnemyInAttackRange.Count > 0 && CanIAct(thisUnit, 2))
             {
-                Debug.Log("Attacking Enemy");
+                Debug.Log($"{thisUnit.name} has enemies in attack range, attacking.");
                 return AIState.Attacking;
-            }
-
-            // NEW: Secondary attack check - any enemy in max range
-            var anyEnemyInMaxRange = enemies.Where(ed => ed.distance <= thisUnit.atkRange).ToList();
-            if (anyEnemyInMaxRange.Count > 0 && CanIAct(thisUnit, 2))
-            {
-                // Check if it's worth taking a suboptimal shot
-                if (ShouldTakeSuboptimalShot(anyEnemyInMaxRange))
-                {
-                    Debug.Log($"{thisUnit.name} taking opportunistic shot at max range.");
-                    return AIState.Attacking;
-                }
             }
 
             // Move to engage
@@ -183,57 +175,6 @@ public class AIManager : MonoBehaviour
 
         return AIState.Idle;
     }
-
-    // NEW: Helper method to determine if a suboptimal shot is worth taking
-    private bool ShouldTakeSuboptimalShot(List<(Character enemy, int distance)> enemiesInRange)
-    {
-        // Take the shot if:
-        // 1. Enemy is low on health (high chance to finish them)
-        // 2. Enemy is out of cover (better hit chance)
-        // 3. We're in good cover (safe to take the shot)
-        // 4. No better positioning is easily available
-
-        foreach (var enemyData in enemiesInRange)
-        {
-            Character enemy = enemyData.enemy;
-
-            // High priority: Enemy is very low health
-            if (enemy.HP < enemy.maxHP * 0.25f)
-            {
-                Debug.Log($"Taking shot at low-health {enemy.name}");
-                return true;
-            }
-
-            // Medium priority: Enemy is out of cover and we're in cover
-            if (!enemy.HasCoverAgainst(thisUnit.transform.position) && thisUnit.IsInCover())
-            {
-                Debug.Log($"Taking shot at exposed {enemy.name} from cover");
-                return true;
-            }
-
-            // Low priority: We have nothing better to do and enemy is moderately damaged
-            if (enemy.HP < enemy.maxHP * 0.6f)
-            {
-                // Check if we could easily get to a better position
-                var walkableTiles = GetWalkableTilesInRange(thisUnit, (int)thisUnit.MaxMoveSpeed);
-                bool betterPositionExists = walkableTiles.Any(tile =>
-                {
-                    int distanceToEnemy = ManhattanDistance(tile, enemy.GetComponent<GridObject>().positionOnGrid);
-                    return distanceToEnemy <= optimalRange &&
-                           GetCoverAtPosition(tile).Values.Any(cover => cover != CoverType.None);
-                });
-
-                if (!betterPositionExists)
-                {
-                    Debug.Log($"No better position available, taking available shot at {enemy.name}");
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
 
     private void SeekCover()
     {

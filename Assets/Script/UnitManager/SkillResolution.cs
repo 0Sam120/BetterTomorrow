@@ -29,8 +29,10 @@ public class SkillResolution : MonoBehaviour
             GridObject gridObject = GridMap.Instance.GetPlacedObject(cell);
             if (gridObject != null)
             {
+                Debug.Log(gridObject.name);
+
                 Character character = gridObject.GetComponent<Character>();
-                if (character != null && character != TurnManager.Instance.currentUnit)
+                if (character != null)
                 {
                     validTargets.Add(character);
                 }

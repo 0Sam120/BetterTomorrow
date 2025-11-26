@@ -59,10 +59,12 @@ public class SkillComponent : MonoBehaviour
         switch (skill.rollType)
         {
             case RollType.None:
+                Debug.Log("No roll needed");
                 ApplyEffect(skill, targets);
                 break;
             case RollType.Save:
-                foreach(var target in targets)
+                Debug.Log("Making saves");
+                foreach (var target in targets)
                 {
                     if(target.MakeASave() >= GetComponent<Character>().save)
                     {
@@ -98,8 +100,10 @@ public class SkillComponent : MonoBehaviour
         
         Character user = GetComponent<Character>();
 
+        Debug.Log($"Appplying effects to {targets.Count} targets");
         foreach (var target in targets)
         {
+            Debug.Log($"Applying effects to {target.name}");
             foreach (var effect in skill.effects)
             {
                 effect.ApplyEffect(user, target, skill);

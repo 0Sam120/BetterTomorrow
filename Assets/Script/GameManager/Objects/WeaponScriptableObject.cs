@@ -10,6 +10,7 @@ public class WeaponScriptableObject : ScriptableObject
     public int damageDie = 6; // e.g., d6
     public int dieCount = 1; // Number of dice to roll
     public int penetration = 0; // Armour penetration value
+    public DamageTypes damageType;
     public List<WeaponAction> actions; // List of actions this weapon can perform
 
 }

@@ -113,8 +113,9 @@ public class Character : MonoBehaviour
         return total;
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage, DamageTypes damageType)
     {
+        
         HP -= (int)(damage * resistance);
         if (HP <= 0)
         {
@@ -124,6 +125,7 @@ public class Character : MonoBehaviour
         {
             healthBar.UpdateHealthBar(HP, maxHP);
         }
+
     }
 
     public void Heal(int amount)

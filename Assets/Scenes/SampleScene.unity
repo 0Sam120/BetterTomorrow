@@ -440,8 +440,12 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3585287211564536947, guid: 0299d5fd51c31dd4a8a8ef313d8f1d6f, type: 3}
+      propertyPath: atkMod
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3585287211564536947, guid: 0299d5fd51c31dd4a8a8ef313d8f1d6f, type: 3}
       propertyPath: InitiativeMod
-      value: 2
+      value: -100
       objectReference: {fileID: 0}
     - target: {fileID: 5321722145572085030, guid: 0299d5fd51c31dd4a8a8ef313d8f1d6f, type: 3}
       propertyPath: armourData
@@ -840,19 +844,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37e799c9a840fd44ebedbefeebe86992, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1757796867
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 583790939}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f297c16e7ecd20e4999f9d7d104f5e82, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gridRenderer: {fileID: 614932647}
 --- !u!114 &1757796868
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1070,9 +1061,6 @@ PrefabInstance:
       addedObject: {fileID: 1757796860}
     - targetCorrespondingSourceObject: {fileID: 7336422917251771928, guid: 5f0044cc369ac1d4ab1c12a1ad566c41, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1757796867}
-    - targetCorrespondingSourceObject: {fileID: 7336422917251771928, guid: 5f0044cc369ac1d4ab1c12a1ad566c41, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 1757796868}
   m_SourcePrefab: {fileID: 100100000, guid: 5f0044cc369ac1d4ab1c12a1ad566c41, type: 3}
 --- !u!1001 &3189188232625305588
@@ -1265,6 +1253,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1024620985}
     - target: {fileID: 8270559002750124029, guid: 45440d420bb4c754fb7241c7b97dd65f, type: 3}
+      propertyPath: atkMod
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8270559002750124029, guid: 45440d420bb4c754fb7241c7b97dd65f, type: 3}
       propertyPath: atkRange
       value: 100
       objectReference: {fileID: 0}
@@ -1274,7 +1266,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8270559002750124029, guid: 45440d420bb4c754fb7241c7b97dd65f, type: 3}
       propertyPath: InitiativeMod
-      value: -100
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8533437037282658609, guid: 45440d420bb4c754fb7241c7b97dd65f, type: 3}
       propertyPath: turnManager
