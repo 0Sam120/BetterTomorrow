@@ -55,6 +55,7 @@ MonoBehaviour:
   Name: 
   Portrait: {fileID: 0}
   MaxMoveSpeed: 0
+  resistance: 1
   maxHP: 0
   HP: 0
   maxAP: 20
@@ -62,9 +63,9 @@ MonoBehaviour:
   atkRange: 0
   atkMod: 0
   DMGMod: 0
+  save: 14
   InitiativeMod: 0
   Initiative: 0
-  damageTaken: 0
   team: 0
 --- !u!114 &6415032606466757069
 MonoBehaviour:

@@ -93,7 +93,7 @@ public class CharacterAttack : MonoBehaviour
     public void CancelAttack()
     {
         TargetingUI.Instance.Hide();
-        SelectCharacter.Instance.MoveCommandSelected();
+        TurnManager.Instance.ShowMovementOutline();
         CameraHelper.Instance.ResetCameraPosition(true);
         CameraHelper.Instance.ToggleGameCamera();
         CharacterMenu.instance.OpenMenu();

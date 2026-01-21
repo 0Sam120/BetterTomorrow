@@ -8,9 +8,13 @@ public class SkillComponent : MonoBehaviour
 
     // Runtime state per skill (cooldowns, charges, etc.)
     private Dictionary<SkillsScriptableObject, SkillRuntimeData> skillStates = new Dictionary<SkillsScriptableObject, SkillRuntimeData>();
+    private Character character;
 
     private void Awake()
     {
+        
+        character = GetComponent<Character>();
+        
         // Initialize runtime data for each known skill
         foreach (var skill in knownSkills)
         {
@@ -29,7 +33,7 @@ public class SkillComponent : MonoBehaviour
     }
 
     // Check if a skill can currently be used
-    private bool CanUseSkill(SkillsScriptableObject skill)
+    public bool CanUseSkill(SkillsScriptableObject skill)
     {
         if (!skillStates.ContainsKey(skill)) return false;
 
@@ -43,6 +47,12 @@ public class SkillComponent : MonoBehaviour
         if (data.limitedCharges && data.chargesLeft <= 0)
         {
             Debug.Log("Can't use a charge");
+            return false;
+        }
+
+        if(character.AP < skill.cost)
+        {
+            Debug.Log("Not enough AP to use the skill");
             return false;
         }
 
@@ -89,9 +99,15 @@ public class SkillComponent : MonoBehaviour
         data.currentCooldown = skill.cooldown;
         if (skill.limitedCharges && skill.maxCharges > 0)
             data.chargesLeft--;
+        character.AP -= skill.cost;
+        if(TurnManager.Instance.currentUnit == character)
+        {
+            CharacterMenu.instance.UpdateBarValue(character.AP, character.maxAP, false);
+        }
 
         // Here’s where you’d hook in the actual effect application
         Debug.Log($"{gameObject.name} used {skill.skillName}!");
+        TurnManager.Instance.ShowMovementOutline();
     }
 
     private void ApplyEffect(SkillsScriptableObject skill, List<Character> targets)

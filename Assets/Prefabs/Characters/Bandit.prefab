@@ -56,6 +56,7 @@ MonoBehaviour:
   Name: Bandit
   Portrait: {fileID: 0}
   MaxMoveSpeed: 5
+  resistance: 1
   maxHP: 14
   HP: 0
   maxAP: 20
@@ -63,9 +64,9 @@ MonoBehaviour:
   atkRange: 5
   atkMod: 4
   DMGMod: 2
+  save: 14
   InitiativeMod: 2
   Initiative: 0
-  damageTaken: 0
   team: 0
 --- !u!114 &2110401563746346619
 MonoBehaviour:

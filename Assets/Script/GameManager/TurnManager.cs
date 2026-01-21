@@ -156,6 +156,11 @@ public class TurnManager : MonoBehaviour
 
     void IncrementRounds()
     {
+        foreach (var unit in ActiveUnits)
+        {
+            unit.GetComponent<SkillComponent>().TickRound();
+        }
+        
         combatRound++;
         currentInitiativeIndex = 0;
 

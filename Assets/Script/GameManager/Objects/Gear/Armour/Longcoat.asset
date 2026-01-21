@@ -15,6 +15,6 @@ MonoBehaviour:
   armourName: Longcoat
   armourType: 0
   baseAC: 12
-  weakness: 00000000
+  weakness: 
   resistance: 
   immunity: 

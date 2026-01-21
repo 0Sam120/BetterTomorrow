@@ -38,6 +38,11 @@ public class Node
         {
             coverData[dir] = CoverType.None;
         }
+
+        if(gridObject != null)
+        {
+            passable = false;
+        }
     }
 }
 

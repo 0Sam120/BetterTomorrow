@@ -23,14 +23,13 @@ public class Character : MonoBehaviour
     public int HP;
     public int maxAP = 20;
     public int AP;
-    
+
     public int atkRange = 5;
     public int atkMod = 4;
     public int DMGMod = 2; // Damage modifier
     public int save = 14;
     public int InitiativeMod = 2;
     public int Initiative;
-    public int damageTaken;
     public Team team;
     private HealthBar healthBar;
     public static event System.Action<Character> OnCharacterDeath;
@@ -44,8 +43,10 @@ public class Character : MonoBehaviour
     public void Awake()
     {
         var pos = transform.position;
+        Vector2Int gridPos = GridMap.Instance.GetGridPosition(pos);
         SetAC();
-        UpdateTile(GridMap.Instance.GetGridPosition(pos));
+        UpdateTile(gridPos);
+        GridMap.Instance.UpdatePassability(gridPos);
         healthBar = GetComponentInChildren<HealthBar>();
         HP = maxHP; // Initialize HP to max at start
         AP = maxAP; // Initialize AP to max at start
@@ -124,6 +125,10 @@ public class Character : MonoBehaviour
         else
         {
             healthBar.UpdateHealthBar(HP, maxHP);
+            if(TurnManager.Instance.currentUnit == this)
+            {
+                CharacterMenu.instance.UpdateBarValue(HP, maxHP, true);
+            }
         }
 
     }
@@ -136,6 +141,10 @@ public class Character : MonoBehaviour
             HP = maxHP; // Cap HP at maxHP
         }
         healthBar.UpdateHealthBar(HP, maxHP);
+        if (TurnManager.Instance.currentUnit == this)
+        {
+            CharacterMenu.instance.UpdateBarValue(HP, maxHP, true);
+        }
     }
 
     private void Die()

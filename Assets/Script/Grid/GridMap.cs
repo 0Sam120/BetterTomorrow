@@ -100,6 +100,18 @@ public class GridMap : MonoBehaviour, IGridMap
         return true;
     }
 
+    public void UpdatePassability(Vector2Int gridPosition)
+    {
+        if (grid[gridPosition.x, gridPosition.y].passable)
+        {
+            grid[gridPosition.x, gridPosition.y].passable = false;
+        }
+        else
+        {
+            grid[gridPosition.x, gridPosition.y].passable = true;
+        }
+    }
+
     private void CheckPassableGrid()
     {
         for (int y = 0; y < width; y++)

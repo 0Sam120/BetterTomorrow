@@ -83,6 +83,7 @@ public class SelectCharacter : MonoBehaviour
 
     public void AbilityCommandSelected(SkillsScriptableObject skill)
     {
+        if (!TurnManager.Instance.currentUnit.GetComponent<SkillComponent>().CanUseSkill(skill)) return;
         GetComponent<SkillResolution>().SkillTargeting(skill);
         input.SetCommandType(CommandType.UseAbility);
     }

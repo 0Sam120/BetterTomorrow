@@ -24,12 +24,14 @@ public class UnitMovement : MonoBehaviour
         pathWorldPosition = m_GridObject.targetGrid.ConvertPathToWorldPosition(path);
 
         m_GridObject.targetGrid.RemoveObject(m_GridObject.positionOnGrid, m_GridObject);
+        GridMap.Instance.UpdatePassability(m_GridObject.positionOnGrid);
 
         // Update the unit's grid position to the final node of the path
         m_GridObject.positionOnGrid.x = path[path.Count - 1].x;
         m_GridObject.positionOnGrid.y = path[path.Count - 1].y;
 
         m_GridObject.targetGrid.PlaceObject(m_GridObject.positionOnGrid, m_GridObject);
+        GridMap.Instance.UpdatePassability(m_GridObject.positionOnGrid);
 
         RotateTowards(); // Face the first target
         m_AnimationControlller.StartMoving(); // Trigger move animation

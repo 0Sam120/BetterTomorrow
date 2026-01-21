@@ -9,6 +9,10 @@ public class CharacterMenu : MonoBehaviour
     [SerializeField] private GameObject skillWindow;
     [SerializeField] private GameObject characterPortrait;
     [SerializeField] private GameObject actionButton;
+    [SerializeField] private Slider hpBar;
+    [SerializeField] private Slider apBar;
+    [SerializeField] private TextMeshProUGUI hpValue;
+    [SerializeField] private TextMeshProUGUI apValue;
 
     public static CharacterMenu instance { get; private set; }
 
@@ -32,6 +36,9 @@ public class CharacterMenu : MonoBehaviour
         var activeCharacter = TurnManager.Instance.currentUnit;
         var weapon = activeCharacter.GetComponent<GearComponent>().weaponData;
         var skills = activeCharacter.GetComponent<SkillComponent>().knownSkills;
+
+        UpdateBarValue(activeCharacter.HP, activeCharacter.maxHP, true);
+        UpdateBarValue(activeCharacter.AP, activeCharacter.maxAP, false);
 
         characterPortrait.GetComponent<Image>().sprite = activeCharacter.GetComponent<Character>().Portrait;
         for(int i = 0; i < weapon.actions.Count; i++)
@@ -60,6 +67,20 @@ public class CharacterMenu : MonoBehaviour
         }
 
         OpenMenu();
+    }
+
+    public void UpdateBarValue(float currentValue, float maxValue, bool hp)
+    {
+        if (hp)
+        {
+            hpBar.value = currentValue/maxValue;
+            hpValue.text = $"{currentValue}/{maxValue}";
+        }
+        else
+        {
+            apBar.value = currentValue / maxValue;
+            apValue.text = $"{currentValue}/{maxValue}";
+        }
     }
 
     public void ClearOldInfo()
